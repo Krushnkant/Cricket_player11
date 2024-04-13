@@ -328,8 +328,6 @@
         $("#name").focus();
     });
 
-   
-
     $('#seriesModel').on('hidden.bs.modal', function () {
         $(this).find('form').trigger('reset');
         $(this).find("#save_newseriesBtn").removeAttr('data-action');
@@ -406,7 +404,6 @@
             ]
         });
     }
-
 
     function changeseriesStatus(series_id) {
         //var tab_type = get_users_page_tabType();
@@ -557,18 +554,11 @@
         });
     });
 
-    
-
-
-    $('body').on('click', '#viewplayerBtn', function () {
-        var tournament_id = $(this).attr('data-id');
-        var url = "{{ url('admin/player') }}" + "/" + tournament_id;
+    $('body').on('click', '#viewSeriesTeamBtn', function () {
+        var series_id = $(this).attr('data-id');
+        var url = "{{ url('admin/seriesteam') }}" + "/" + series_id;
         window.open(url);
-    });
-
- 
-
-  
+    });  
 </script>
 <!-- user list JS end -->
 @endsection

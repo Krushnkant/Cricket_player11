@@ -205,9 +205,6 @@
                     } else {
                         $('#city-error').hide();
                     }
-
-        
-                
                 }
 
                 if(res.status == 200){
@@ -235,7 +232,7 @@
                         $("#stadiumModel").find("#save_closestadiumBtn").removeAttr('data-id');
                         $('#stadium_id').val("");
                         $('#name-error').html("");
-                        $('#country_id`-error').html("");
+                        $('#country_id-error').html("");
                         $('#state-error').html("");
                         $('#city-error').html("");
             

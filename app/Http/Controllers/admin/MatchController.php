@@ -20,8 +20,6 @@ class MatchController extends Controller
 {
     public function index(){
         $action = "list";
-        
-       
         return view('admin.match.list',compact('action'));
     }
 
@@ -34,8 +32,8 @@ class MatchController extends Controller
         $match = Matche::where('id',$id)->first();
         $seriesteams1 = SeriesTeam::where('series_id',$match->series_id)->where('team_id',$match->team1_id)->first();
         $seriesteams2 = SeriesTeam::where('series_id',$match->series_id)->where('team_id',$match->team2_id)->first();
-        $seriesteamplayer1 = SeriesTeamPlayer::where('series_team_id',$seriesteams1->id)->get();
-        $seriesteamplayer2 = SeriesTeamPlayer::where('series_team_id',$seriesteams2->id)->get();
+        $seriesteamplayer1 = SeriesTeamPlayer::where('series_team_id', $seriesteams1->id)->get();
+        $seriesteamplayer2 = SeriesTeamPlayer::where('series_team_id', $seriesteams2->id)->get();
 
         $matchplayer1 = MatchPlayer::where('match_id',$id)->where('team_id',$match->team1_id)->get()->pluck('player_id')->toArray();
         $matchplayer2 = MatchPlayer::where('match_id',$id)->where('team_id',$match->team2_id)->get()->pluck('player_id')->toArray();

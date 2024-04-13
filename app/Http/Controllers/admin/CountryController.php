@@ -88,18 +88,19 @@ class CountryController extends Controller
             $dir = $request->input('order.0.dir');
 
             if($order == "id"){
-                $order == "created_at";
-                $dir = 'desc';
+                $order = "name";
+                $dir = 'ASC';
             }
 
             if(empty($request->input('search.value')))
             {
                 $countrys = Country::offset($start)
                     ->limit($limit)
-                    ->orderBy($order,$dir)
+                    ->orderBy($order, $dir)
+                    // ->toSql();
                     ->get();
-            }
-            else {
+                    // dd($countrys);
+            } else {
                 $search = $request->input('search.value');
                 $countrys =  Country::where(function($query) use($search){
                       $query->where('id','LIKE',"%{$search}%")

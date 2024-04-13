@@ -35,7 +35,7 @@ class SeriesTeamController extends Controller
         if($request->seriesteam_id){
             $SeriesTeamPlayer = SeriesTeamPlayer::where('series_team_id',$request->seriesteam_id)->get();
             foreach($SeriesTeamPlayer as $TeamPlayer){
-                if(!in_array($TeamPlayer->player_id,$request->series_team_players)){
+                if(!in_array($TeamPlayer->player_id, $request->series_team_players)){
                     $seriesteam = SeriesTeamPlayer::find($TeamPlayer->id);
                     $seriesteam->delete(); 
                 }
@@ -53,9 +53,7 @@ class SeriesTeamController extends Controller
             } 
         }
 
-
-    
-        $seriesteam->save();
+        // $seriesteam->save();
         return response()->json(['status' => '200', 'action' => 'update']);
     }
 
@@ -113,14 +111,14 @@ class SeriesTeamController extends Controller
 
                     $action='';
                     if ( getUSerRole()==1 || (getUSerRole()!=1 && is_write($page_id)) ){
-                        $action .= '<button id="editseriesteamBtn" class="btn btn-gray text-blue btn-sm" data-toggle="modal" data-target="#seriesteamModel" onclick="" data-id="' .$seriesteam->id. '"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
+                        $action .= '<button id="editseriesteamBtn" class="btn btn-gray text-blue btn-sm" data-toggle="modal" data-target="#seriesteamModel" data-placement="top" title="View Team Player" onclick="" data-id="' .$seriesteam->id. '"><i class="fa fa-users" aria-hidden="true"></i></button>';
                     }
                     if ( getUSerRole()==1 || (getUSerRole()!=1 && is_delete($page_id)) ){
                         $action .= '<button id="deleteseriesteamBtn" class="btn btn-gray text-danger btn-sm" data-toggle="modal" data-target="#DeleteseriesteamModel" onclick="" data-id="' .$seriesteam->id. '"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
                     }
 
                     $nestedData['name'] = $seriesteam->team->name;
-                    $nestedData['created_at'] = date('Y-m-d H:i:s', strtotime($seriesteam->created_at));
+                    $nestedData['created_at'] = date('d-m-Y H:i A', strtotime($seriesteam->created_at));
                     $nestedData['action'] = $action;
                     $data[] = $nestedData;
 

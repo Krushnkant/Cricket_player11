@@ -131,8 +131,7 @@ class SeriesController extends Controller
                     ->limit($limit)
                     ->orderBy($order,$dir)
                     ->get();
-            }
-            else {
+            } else {
                 $search = $request->input('search.value');
                 $seriess =  Series::where(function($query) use($search){
                       $query->where('id','LIKE',"%{$search}%")
@@ -174,7 +173,7 @@ class SeriesController extends Controller
                     $action='';
                     if ( getUSerRole()==1 || (getUSerRole()!=1 && is_write($page_id)) ){
                         $action .= '<button id="editseriesBtn" class="btn btn-gray text-blue btn-sm" data-toggle="modal" data-target="#seriesModel" onclick="" data-id="' .$series->id. '"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
-                        $action .= '<button id="viewSeriesTeamBtn" title="Series Team" class="btn btn-gray text-blue btn-sm" data-id="' .$series->id. '"><i class="fa fa-users" aria-hidden="true"></i></button>';
+                        $action .= '<button id="viewSeriesTeamBtn" title="Series Team" class="btn btn-gray text-blue btn-sm" data-id="' .$series->id. '"><i class="fa fa-users" aria-hidden="true"></i></button>'; 
 
                     }
                     if ( getUSerRole()==1 || (getUSerRole()!=1 && is_delete($page_id)) ){

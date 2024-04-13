@@ -1,15 +1,14 @@
 <?php
-
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use \Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserLogin;
 use App\Models\CustomerDeviceToken;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
-
+use App\Http\Resources\UserResource;
 
 class AuthController extends BaseController
 {

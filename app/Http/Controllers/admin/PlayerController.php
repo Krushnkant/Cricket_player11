@@ -110,8 +110,8 @@ class PlayerController extends Controller
             $dir = $request->input('order.0.dir');
 
             if($order == "id"){
-                $order == "created_at";
-                $dir = 'desc';
+                $order = "name";
+                $dir = 'ASC';
             }
 
             if(empty($request->input('search.value')))

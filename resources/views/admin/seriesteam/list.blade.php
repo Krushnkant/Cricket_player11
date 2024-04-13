@@ -16,29 +16,26 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-
-
                         <div class="tab-pane fade show active table-responsive" id="all_user_tab">
                             <table id="all_seriesteam" class="table zero-configuration customNewtable" style="width:100%">
                                 <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Name</th>
-                                    <th>Date</th>
-                                    <th>Other</th>
-                                </tr>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Name</th>
+                                        <th>Date</th>
+                                        <th>Other</th>
+                                    </tr>
                                 </thead>
                                 <tfoot>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Name</th>
-                                    <th>Date</th>
-                                    <th>Other</th>
-                                </tr>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Name</th>
+                                        <th>Date</th>
+                                        <th>Other</th>
+                                    </tr>
                                 </tfoot>
                             </table>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -73,8 +70,8 @@
                     </div>
                     <div class="modal-footer">
                         <input type="hidden" name="seriesteam_id" id="seriesteam_id">
-                        <button type="button" class="btn btn-outline-primary" id="save_newseriesteamBtn">Save & New <i class="fa fa-circle-o-notch fa-spin loadericonfa" style="display:none;"></i></button>
-                        <button type="button" class="btn btn-primary" id="save_closeseriesteamBtn">Save & Close <i class="fa fa-circle-o-notch fa-spin loadericonfa" style="display:none;"></i></button>
+                        <!-- <button type="button" class="btn btn-outline-primary" id="save_newseriesteamBtn">Save & New <i class="fa fa-circle-o-notch fa-spin loadericonfa" style="display:none;"></i></button> -->
+                        <button type="button" class="btn btn-primary" id="save_closeseriesteamBtn">Save <i class="fa fa-circle-o-notch fa-spin loadericonfa" style="display:none;"></i></button>
                     </div>
                 </form>
             </div>
@@ -114,9 +111,7 @@
             closeOnSelect: false,
         });
     });
-
     
-
     function save_seriesteam(btn,btn_type){
         $(btn).prop('disabled',true);
         $(btn).find('.loadericonfa').show();
@@ -138,10 +133,10 @@
                     $(btn).prop('disabled',false);
                     $(btn).find('.loadericonfa').hide();
                     
-                    if (res.errors.name) {
-                        $('#name-error').show().text(res.errors.name);
+                    if (res.errors.series_team_players) {
+                        $('#series_team_players-error').show().text(res.errors.series_team_players);
                     } else {
-                        $('#name-error').hide();
+                        $('#series_team_players-error').hide();
                     }
 
                  
@@ -173,7 +168,7 @@
                         $("#seriesteamModel").find("#save_newseriesteamBtn").removeAttr('data-id');
                         $("#seriesteamModel").find("#save_closeseriesteamBtn").removeAttr('data-id');
                         $('#seriesteam_id').val("");
-                        $('#name-error').html("");
+                        $('#series_team_players-error').html("");
             
                       
                     
@@ -232,7 +227,7 @@
         $(this).find("#save_newseriesteamBtn").removeAttr('data-id');
         $(this).find("#save_closeseriesteamBtn").removeAttr('data-id');
         $('#seriesteam_id').val("");
-        $('#name-error').html("");
+        $('#series_team_players-error').html("");
 
         var default_image = "{{ asset('photos/default_avatar.jpg') }}";
         $('#thumb_img_image_show').attr('src', default_image);
