@@ -72,14 +72,14 @@
                                 <div class="col-sm-8" id="gender_val">{{ ($user->gender==1)?'Male':'Female' }}</div>
                             </div>
                             @endif
-                            @if($user->dob != "")
+                            <!-- @if($user->dob != "")
                             <div class="row custom-row">
                                 <div class="col-sm-4">
                                     <b>Date of Birth<span class="editorderListGem"></span></b>
                                 </div>
                                 <div class="col-sm-8" id="dob_val">{{ isset($user->dob)?$user->dob:'' }}</div>
                             </div>
-                            @endif
+                            @endif -->
                             <div class="row custom-row">
                                 <div class="col-sm-4">
                                     <b>Password<span class="editorderListGem"></span></b>
@@ -148,14 +148,14 @@
                             </div>
                             <div id="gender-error" class="invalid-feedback animated fadeInDown" style="display: none;"></div>
                         </div>
-                        <div class="form-group ">
+                        <!-- <div class="form-group ">
                             <label class="col-form-label" for="dob">Date of Birth <span class="text-danger">*</span>
                             </label>
                             <div class="input-group">
                                 <input type="text" class="form-control custom_date_picker" id="dob" name="dob" placeholder="yyyy-mm-dd" data-date-format="yyyy-mm-dd" data-date-end-date="0d"> <span class="input-group-append"><span class="input-group-text"><i class="mdi mdi-calendar-check"></i></span></span>
                                 <div id="dob-error" class="invalid-feedback animated fadeInDown" style="display: none;"></div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="modal-footer">
                         <input type="hidden" name="user_id" id="user_id">
@@ -193,7 +193,7 @@ $('#UserModal').on('hidden.bs.modal', function () {
     $('#profilepic-error').html("");
     $('#full_name-error').html("");
     $('#mobileno-error').html("");
-    $('#dob-error').html("");
+    // $('#dob-error').html("");
     $('#gender-error').html("");
     $('#email-error').html("");
     $('#password-error').html("");
@@ -215,7 +215,7 @@ $('body').on('click', '#EditProfileBtn', function () {
         }
         $('#full_name').val(data.full_name);
         $('#mobile_no').val(data.mobile_no);
-        $('#dob').val(data.dob);
+        // $('#dob').val(data.dob);
         $('#email').val(data.email);
         $('#password').val(data.decrypted_password);
         $("input[name=gender][value=" + data.gender + "]").prop('checked', true);
@@ -257,11 +257,11 @@ $('body').on('click', '#save_UserBtn', function () {
                     $('#mobileno-error').hide();
                 }
 
-                if (res.errors.dob) {
-                    $('#dob-error').show().text(res.errors.dob);
-                } else {
-                    $('#dob-error').hide();
-                }
+                // if (res.errors.dob) {
+                //     $('#dob-error').show().text(res.errors.dob);
+                // } else {
+                //     $('#dob-error').hide();
+                // }
 
                 if (res.errors.email) {
                     $('#email-error').show().text(res.errors.email);
@@ -289,7 +289,7 @@ $('body').on('click', '#save_UserBtn', function () {
                 else{
                     $("#gender_val").html('Male');
                 }
-                $("#dob_val").html(res.user.dob);
+                // $("#dob_val").html(res.user.dob);
                 $("#password_val").html(res.user.decrypted_password);
                 if(res.user.profile_pic!=null) {
                     $('#Profile_pic_val').attr('src', "{{url('images/profile_pic')}}" +"/" + res.user.profile_pic);

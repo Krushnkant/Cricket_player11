@@ -130,14 +130,14 @@
                             </div>
                             <div id="gender-error" class="invalid-feedback animated fadeInDown" style="display: none;"></div>
                         </div>
-                        <div class="form-group ">
+                        <!-- <div class="form-group ">
                             <label class="col-form-label" for="dob">Date of Birth <span class="text-danger">*</span>
                             </label>
                             <div class="input-group">
                                 <input type="text" class="form-control custom_date_picker" id="dob" name="dob" placeholder="yyyy-mm-dd" data-date-format="yyyy-mm-dd" data-date-end-date="0d"> <span class="input-group-append"><span class="input-group-text"><i class="mdi mdi-calendar-check"></i></span></span>
                                 <div id="dob-error" class="invalid-feedback animated fadeInDown" style="display: none;"></div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="modal-footer">
                         <input type="hidden" name="user_id" id="user_id">
@@ -244,11 +244,11 @@
                         $('#password-error').hide();
                     }
 
-                    if (res.errors.dob) {
-                        $('#dob-error').show().text(res.errors.dob);
-                    } else {
-                        $('#dob-error').hide();
-                    }
+                    // if (res.errors.dob) {
+                    //     $('#dob-error').show().text(res.errors.dob);
+                    // } else {
+                    //     $('#dob-error').hide();
+                    // }
                 }
 
                 if(res.status == 200){
@@ -280,7 +280,7 @@
                         $('#mobileno-error').html("");
                         $('#email-error').html("");
                         $('#password-error').html("");
-                        $('#dob-error').html("");
+                        // $('#dob-error').html("");
                         $('#gender-error').html("");
                         var default_image = "{{ asset('photos/default_avatar.jpg') }}";
                         $('#profilepic_image_show').attr('src', default_image);
@@ -357,7 +357,7 @@
         $('#mobileno-error').html("");
         $('#email-error').html("");
         $('#password-error').html("");
-        $('#dob-error').html("");
+        // $('#dob-error').html("");
         $('#gender-error').html("");
         var default_image = "{{ asset('photos/default_avatar.jpg') }}";
         $('#profilepic_image_show').attr('src', default_image);
@@ -468,11 +468,12 @@
                 var profile_pic =  data.profile_pic;
                 $('#profilepic_image_show').attr('src', profile_pic);
             }
-            $('#full_name').val(data.full_name);
+            $('#first_name').val(data.first_name);
+            $('#last_name').val(data.last_name);
             $('#mobile_no').val(data.mobile_no);
             $('#email').val(data.email);
             $('#password').val(data.decrypted_password);
-            $('#dob').val(data.dob);
+            // $('#dob').val(data.dob);
             $("input[name=gender][value=" + data.gender + "]").prop('checked', true);
         })
     });

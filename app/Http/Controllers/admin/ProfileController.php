@@ -31,7 +31,7 @@ class ProfileController extends Controller
             'profile_pic.mimes' =>'Please provide a Valid Extension Image(e.g: .jpg .png)',
             'full_name.required' =>'Please provide a Full Name',
             'mobile_no.required' =>'Please provide a Mobile No.',
-            'dob.required' =>'Please provide a Date of Birth.',
+            // 'dob.required' =>'Please provide a Date of Birth.',
             'email.required' =>'Please provide a valid E-mail address.',
             'password.required' =>'Please provide a Password.',
         ];
@@ -40,7 +40,7 @@ class ProfileController extends Controller
             'profile_pic' => 'image|mimes:jpeg,png,jpg',
             'full_name' => 'required',
             'mobile_no' => 'required|numeric|digits:10',
-            'dob' => 'required',
+            // 'dob' => 'required',
             'email' => 'required|email',
             'password' => 'required',
         ], $messages);
@@ -61,7 +61,7 @@ class ProfileController extends Controller
         $user->first_name = $request->full_name;
         $user->mobile_no = $request->mobile_no;
         $user->gender = $request->gender;
-        $user->dob = $request->dob;
+        // $user->dob = $request->dob;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
         $user->decrypted_password = $request->password;

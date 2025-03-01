@@ -46,7 +46,7 @@ class AuthController extends Controller
             if (Auth::attempt($credentials)) {
                     $position = Location::get($request->ip());
                     $browser = Agent::browser();
-                    $user->last_login_date = new \DateTime(null, new \DateTimeZone('Asia/Kolkata'));
+                    // $user->last_login_date = new \DateTime(null, new \DateTimeZone('Asia/Kolkata'));
                     $user->save(); 
 
                     $userlogin = New UserLogin();

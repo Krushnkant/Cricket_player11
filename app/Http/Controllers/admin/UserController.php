@@ -28,7 +28,7 @@ class UserController extends Controller
             'mobile_no.required' =>'Please provide a Mobile No.',
             'email.required' =>'Please provide a Email Address.',
             'password.required' =>'Please provide a Password.',
-            'dob.required' =>'Please provide a Date of Birth.',
+            // 'dob.required' =>'Please provide a Date of Birth.',
         ];
 
         if (isset($request->action) && $request->action=="update"){
@@ -39,7 +39,7 @@ class UserController extends Controller
                 'mobile_no' => 'required|numeric|digits:10',
                 'email' => 'required|email',
                 'password' => 'required',
-                'dob' => 'required',
+                // 'dob' => 'required',
             ], $messages);
         }
         else{
@@ -50,7 +50,7 @@ class UserController extends Controller
                 'mobile_no' => 'required|numeric|digits:10',
                 'email' => 'required|email|unique:users',
                 'password' => 'required',
-                'dob' => 'required',
+                // 'dob' => 'required',
             ], $messages);
         }
 
@@ -76,7 +76,7 @@ class UserController extends Controller
             $user->password = Hash::make($request->password);
             $user->decrypted_password = $request->password;
             $user->gender = $request->gender;
-            $user->dob = $request->dob;
+            // $user->dob = $request->dob;
         }
         else{
             $action = "add";
@@ -88,7 +88,7 @@ class UserController extends Controller
             $user->password = Hash::make($request->password);
             $user->decrypted_password = $request->password;
             $user->gender = $request->gender;
-            $user->dob = $request->dob;
+            // $user->dob = $request->dob;
             $user->role = 2;
             $image_name=null;
         }

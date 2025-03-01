@@ -15,21 +15,22 @@ return new class extends Migration
     {
         Schema::create('match_scoreboards', function (Blueprint $table) {
             $table->id();
-            $table->integer('match_player_id')->nullable();
-            $table->integer('match_id')->nullable();
-            $table->integer('player_id')->nullable();
+            $table->integer('match_player_id')->index();
+            $table->integer('match_id')->index();
+            $table->integer('player_id')->index();
             $table->integer('ball')->nullable(); 
             $table->integer('run')->nullable();
             $table->integer('four')->nullable();
             $table->integer('six')->nullable();
             $table->float('strike_rate')->nullable();
             $table->float('over')->nullable();
-            $table->integer('ball_run')->nullable();
-            $table->integer('maiden')->nullable(); 
-            $table->integer('wicket')->nullable(); 
-            $table->integer('wide')->nullable();
-            $table->integer('noball')->nullable();
+            $table->integer('ball_run')->default(0)->comment('Total Given Run by Bowler');
+            $table->integer('maiden')->default(0)->comment('Total Maiden'); 
+            $table->integer('wicket')->default(0)->comment('Total Wickets'); 
+            $table->integer('wide')->default(0)->comment('Total Wide');
+            $table->integer('noball')->default(0)->comment('Total Noball');
             $table->float('economy_rate')->nullable();
+            $table->float('fantasy_point')->default(0);
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());
             $table->dateTime('updated_at')->default(null)->onUpdate(\Carbon\Carbon::now());
             $table->softDeletes();

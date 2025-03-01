@@ -13,11 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('series_teams', function (Blueprint $table) {
+        Schema::create('user_coupon', function (Blueprint $table) {
             $table->id();
-            $table->integer('series_id')->index(); 
-            $table->integer('team_id')->index();
-            $table->integer('eFormat')->default(1)->index()->comment('1->T20,2->ODI,3->Both'); 
+            $table->integer('user_id')->index()->comment('0 for All Users');
+            $table->text('coupon_code');
+            $table->date('expiry_date');
+            $table->integer('estatus')->default(1)->comment('1->Active,2->Deactive,3->Deleted,4->Pending');
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());
             $table->dateTime('updated_at')->default(null)->onUpdate(\Carbon\Carbon::now());
             $table->softDeletes();
@@ -31,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('series_teams');
+        Schema::dropIfExists('user_coupon');
     }
 };

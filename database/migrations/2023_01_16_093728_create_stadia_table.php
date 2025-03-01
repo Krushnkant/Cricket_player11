@@ -13,14 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('stadia', function (Blueprint $table) {
+        Schema::create('stadium', function (Blueprint $table) {
             $table->id();
             $table->string('name',255)->nullable();
             $table->string('short_name',255)->nullable();
-            $table->integer('country_id')->nullable();
+            $table->integer('country_id')->index();
             $table->string('state',255)->nullable();
             $table->string('city',255)->nullable();
-            $table->integer('estatus')->default(1)->comment('1->Active,2->Deactive,3->Deleted,4->Pending');
+            $table->integer('estatus')->default(1)->comment('1->Active,2->Deactive,3->Deleted,4->Pending')->index();
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());
             $table->dateTime('updated_at')->default(null)->onUpdate(\Carbon\Carbon::now());
             $table->softDeletes();
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('stadia');
+        Schema::dropIfExists('stadium');
     }
 };

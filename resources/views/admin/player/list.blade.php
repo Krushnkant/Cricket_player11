@@ -124,6 +124,7 @@
                                 <option value="1">Fast</option>
                                 <option value="2">Spinner</option>
                                 <option value="3">Medium</option>
+                                <option value="4">None</option>
                             </select>
                             <label id="bowling_style-error" class="error invalid-feedback animated fadeInDown" for="question" style="color: red"></label>
                         </div>
@@ -135,6 +136,7 @@
                                 <option value="1">Left Arm</option>
                                 <option value="2">Right Arm</option>
                                 <option value="3">Both</option>
+                                <option value="4">None</option>
                             </select>
                             <label id="bowling_arm-error" class="error invalid-feedback animated fadeInDown" for="question" style="color: red"></label>
                         </div>

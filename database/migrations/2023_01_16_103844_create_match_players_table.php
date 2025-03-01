@@ -15,9 +15,10 @@ return new class extends Migration
     {
         Schema::create('match_players', function (Blueprint $table) {
             $table->id();
-            $table->integer('match_id')->nullable();
-            $table->integer('player_id')->nullable();
-            $table->integer('team_id')->nullable();
+            $table->integer('series_team_id')->index();
+            $table->integer('match_id')->index();
+            $table->integer('player_id')->index();
+            $table->integer('series_team_player_id')->index();
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());
             $table->dateTime('updated_at')->default(null)->onUpdate(\Carbon\Carbon::now());
             $table->softDeletes();

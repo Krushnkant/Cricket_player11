@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::create('series', function (Blueprint $table) {
             $table->id();
             $table->string('name',255)->nullable();
-            $table->integer('tournament_id')->nullable(); 
-            $table->integer('series_type')->default(1)->comment('1->T20,2->ODI,3->Both');
+            $table->integer('tournament_id')->index(); 
+            $table->integer('series_type')->default(1)->index()->comment('1->T20,2->ODI,3->Both');
             $table->dateTime('start_date');
             $table->dateTime('end_date');
-            $table->integer('estatus')->default(1)->comment('1->Active,2->Deactive,3->Deleted,4->Pending');
+            $table->integer('estatus')->default(1)->index()->comment('1->Active,2->Deactive,3->Deleted,4->Pending');
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());
             $table->dateTime('updated_at')->default(null)->onUpdate(\Carbon\Carbon::now());
             $table->softDeletes();

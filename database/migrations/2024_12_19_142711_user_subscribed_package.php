@@ -13,14 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('series_teams', function (Blueprint $table) {
+        Schema::create('user_subscribed_package', function (Blueprint $table) {
             $table->id();
-            $table->integer('series_id')->index(); 
-            $table->integer('team_id')->index();
-            $table->integer('eFormat')->default(1)->index()->comment('1->T20,2->ODI,3->Both'); 
+            $table->integer('user_id');
+            $table->integer('package_id')->index();
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());
-            $table->dateTime('updated_at')->default(null)->onUpdate(\Carbon\Carbon::now());
-            $table->softDeletes();
         });
     }
 
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('series_teams');
+        Schema::dropIfExists('user_subscribed_package');
     }
 };

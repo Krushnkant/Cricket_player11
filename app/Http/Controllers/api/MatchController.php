@@ -187,7 +187,7 @@ class MatchController extends BaseController
             if($commentries['isOut'] == 1){
                $matchcommentry->out_type = outType($commentries['outType']);
             }
-            $matchcommentry->out_by_fielder_id = (count($runOutPlayer1) > 0)?implode(',',$runOutPlayer1):"";
+            $matchcommentry->out_by_fielder_id = (count($runOutPlayer1) > 0) ? implode(',',$runOutPlayer1) : "";
             $matchcommentry->run_out_batsman_id = $runOutPlayer;
             $matchcommentry->is_extra_run = $commentries['isExtraRun'];
             $matchcommentry->commentry = $commentries['commentry'];

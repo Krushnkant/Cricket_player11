@@ -124,19 +124,19 @@ class AuthController extends BaseController
         return $this->sendResponseWithData($user,"Device Token updated.");
     }
 
-    public function user_login_log(Request $request,$id){
+    public function user_login_log(Request $request, $id){
 
-        $user = User::where('id',$id)->where('estatus',1)->first();
+        $user = User::where('id', $id)->where('estatus', 1)->first();
         if ($user)
         {
-            $user->last_login_date = new \DateTime(null, new \DateTimeZone('Asia/Kolkata'));
-            $user->save(); 
+            // $user->last_login_date = new \DateTime(null, new \DateTimeZone('Asia/Kolkata'));
+            // $user->save(); 
 
             $userlogin = New UserLogin();
             $userlogin->user_id =  $user->id;
-            $userlogin->country =  isset($request->countryName)?$request->countryName:"";
-            $userlogin->state =  isset($request->regionName)?$request->regionName:"";
-            $userlogin->city =  isset($request->cityName)?$request->cityName:"";
+            $userlogin->country =  isset($request->countryName) ? $request->countryName : "";
+            $userlogin->state =  isset($request->regionName) ? $request->regionName : "";
+            $userlogin->city =  isset($request->cityName) ? $request->cityName : "";
             $userlogin->created_at = new \DateTime(null, new \DateTimeZone('Asia/Kolkata'));
             $userlogin->save();
             return $this->sendResponseSuccess('log create successfully.');

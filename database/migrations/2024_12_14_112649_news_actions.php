@@ -13,8 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('teams', function (Blueprint $table) {
-            $table->integer('sr_no')->after('thumb_img');
+        Schema::create('news_actions', function (Blueprint $table) {
+            $table->id();
+            $table->integer('news_id')->index();
+            $table->integer('user_id')->index();
+            $table->enum('action', [1,2])->default(1)->comment('1->Like,2->Share')->index();
+            $table->dateTime('created_at')->default(\Carbon\Carbon::now());
         });
     }
 
@@ -25,8 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('teams', function (Blueprint $table) {
-            
-        });
+        Schema::dropIfExists('news_actions');
     }
 };

@@ -13,14 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('series_teams', function (Blueprint $table) {
+        Schema::create('app_campaign_log', function (Blueprint $table) {
             $table->id();
-            $table->integer('series_id')->index(); 
-            $table->integer('team_id')->index();
-            $table->integer('eFormat')->default(1)->index()->comment('1->T20,2->ODI,3->Both'); 
+            $table->integer('app_campaign_id')->index();
+            $table->text('app_campaign_detail');
+            $table->text('browser_name');
+            $table->text('os_name');
+            $table->text('parent_os');
+            $table->text('user_agent');
+            $table->text('client_ip');
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());
-            $table->dateTime('updated_at')->default(null)->onUpdate(\Carbon\Carbon::now());
-            $table->softDeletes();
         });
     }
 
@@ -31,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('series_teams');
+        Schema::dropIfExists('app_campaign_log');
     }
 };
