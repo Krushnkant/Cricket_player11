@@ -16,12 +16,15 @@ return new class extends Migration
         Schema::create('app_campaign_log', function (Blueprint $table) {
             $table->id();
             $table->integer('app_campaign_id')->index();
-            $table->text('app_campaign_detail');
+            $table->integer('app_campaign_detail_id')->index();
+            $table->dateTime('click_time');
             $table->text('browser_name');
             $table->text('os_name');
             $table->text('parent_os');
             $table->text('user_agent');
             $table->text('client_ip');
+            $table->decimal('latitude', 10, 8);
+            $table->decimal('longitude', 11, 8);
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());
         });
     }

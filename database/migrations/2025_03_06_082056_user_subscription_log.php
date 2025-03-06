@@ -13,11 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('app_campaign_log_detail', function (Blueprint $table) {
+        Schema::create('user_subscription_log', function (Blueprint $table) {
             $table->id();
-            $table->integer('app_campaign_log_id')->index();
-            $table->text('utm_key');
-            $table->text('utm_value');
+            $table->integer('user_id')->index();
+            $table->dateTime('subscription_time');
+            $table->integer('package_id')->index();
+            $table->string('reason',500)->nullable();
+            $table->integer('user_coupon_id')->index();
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());
         });
     }
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('app_campaign_log_detail');
+        Schema::dropIfExists('user_subscription_log');
     }
 };
