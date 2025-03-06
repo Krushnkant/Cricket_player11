@@ -99,13 +99,13 @@ class MatchController extends Controller
             $Matche->series_id = $request->serie_id;
             $Matche->team1_id = $request->team1_id;
             $Matche->team2_id = $request->team2_id;
-            $Matche->match_type = $request->match_type;
+            $Matche->eformat = $request->match_type;
             $Matche->stadium_id = $request->stadium_id;
             $Matche->start_date = $request->start_date;
-            $Matche->winner_team_id = isset($request->winner_team_id)?$request->winner_team_id:0;
+            $Matche->win_team_id = isset($request->winner_team_id)?$request->winner_team_id:0;
             $Matche->team1_score = isset($request->team1_score)?$request->team1_score:"";
             $Matche->team2_score = isset($request->team2_score)?$request->team2_score:"";
-            $Matche->winning_statement = isset($request->winning_statement)?$request->winning_statement:"";
+            $Matche->win_text = isset($request->winning_statement)?$request->winning_statement:"";
         }
         else{
             $action = "add";
@@ -113,13 +113,13 @@ class MatchController extends Controller
             $Matche->series_id = $request->serie_id;
             $Matche->team1_id = $request->team1_id;
             $Matche->team2_id = $request->team2_id;
-            $Matche->match_type = $request->match_type;
+            $Matche->eformat = $request->match_type;
             $Matche->stadium_id = $request->stadium_id;
             $Matche->start_date = $request->start_date;
-            $Matche->winner_team_id = isset($request->winner_team_id)?$request->winner_team_id:0;
+            $Matche->win_team_id = isset($request->winner_team_id)?$request->winner_team_id:0;
             $Matche->team1_score = isset($request->team1_score)?$request->team1_score:"";
             $Matche->team2_score = isset($request->team2_score)?$request->team2_score:"";
-            $Matche->winning_statement = isset($request->winning_statement)?$request->winning_statement:"";
+            $Matche->win_text = isset($request->winning_statement)?$request->winning_statement:"";
             $Matche->created_at = new \DateTime(null, new \DateTimeZone('Asia/Kolkata'));
         }
 
@@ -197,7 +197,7 @@ class MatchController extends Controller
                 1 => 'series',
                 2 => 'team',
                 3 => 'stadium',
-                4 => 'match_type',
+                4 => 'eformat',
                 5 => 'start_date',
                 6 => 'action',
             );
@@ -262,7 +262,7 @@ class MatchController extends Controller
                     $nestedData['series'] = $Match->series->name;
                     $nestedData['team'] = $Match->team1->name ." vs ". $Match->team2->name;
                     $nestedData['stadium'] = $Match->stadium->name;
-                    $nestedData['match_type'] = matchType($Match->match_type);
+                    $nestedData['match_type'] = matchType($Match->eformat);
                     $nestedData['start_date'] = date('Y-m-d H:i:s', strtotime($Match->start_date));
                     $nestedData['action'] = $action;
                     $data[] = $nestedData;

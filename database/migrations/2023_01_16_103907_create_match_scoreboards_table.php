@@ -24,11 +24,11 @@ return new class extends Migration
             $table->integer('six')->nullable();
             $table->float('strike_rate')->nullable();
             $table->float('over')->nullable();
-            $table->integer('ball_run')->default(0)->comment('Total Given Run by Bowler');
-            $table->integer('maiden')->default(0)->comment('Total Maiden'); 
-            $table->integer('wicket')->default(0)->comment('Total Wickets'); 
-            $table->integer('wide')->default(0)->comment('Total Wide');
-            $table->integer('noball')->default(0)->comment('Total Noball');
+            $table->unsignedInteger('ball_run')->nullable()->comment('Total Given Run by Bowler');
+            $table->unsignedInteger('maiden')->nullable()->comment('Total Maiden'); 
+            $table->unsignedInteger('wicket')->nullable()->comment('Total Wickets'); 
+            $table->unsignedInteger('wide')->nullable()->comment('Total Wide');
+            $table->unsignedInteger('noball')->nullable()->comment('Total Noball');
             $table->float('economy_rate')->nullable();
             $table->float('fantasy_point')->default(0);
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());

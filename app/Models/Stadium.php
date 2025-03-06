@@ -9,6 +9,8 @@ class Stadium extends Model
 {
     use HasFactory;
 
+    protected $table = 'stadium';
+
     public function coutry(){
         return $this->hasOne(Country::class,'id','country_id');
     }

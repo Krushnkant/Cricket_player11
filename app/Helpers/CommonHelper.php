@@ -182,6 +182,7 @@ function battingStyle($battingStyle){
 }
 
 function bowlingStyle($bowlingStyle){
+    $Type = "None";
     if($bowlingStyle == 1){
         $Type = "Fast";
     }
@@ -194,10 +195,10 @@ function bowlingStyle($bowlingStyle){
 }
 
 function bowlingArm($bowlingArm){
+    $Type = "None";
     if($bowlingArm == 1){
         $Type = "Left Arm";
-    }
-    elseif($bowlingArm == 2){
+    } elseif($bowlingArm == 2){
         $Type = "Right Arm";
     }elseif($bowlingArm == 3){
         $Type = "Both";
