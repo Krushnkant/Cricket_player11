@@ -100,7 +100,7 @@ class MatchController extends BaseController
                             $matchplayer1 = new MatchPlayer();
                             $matchplayer1->match_id = $request->match_id;
                             $matchplayer1->player_id = $player1_id;
-                            $matchplayer1->team_id =1;
+                            $matchplayer1->series_team_id =1;
                             $matchplayer1->save();
                         }
                     }
@@ -180,7 +180,7 @@ class MatchController extends BaseController
             $matchcommentry->batsman_id = $batsman_id;
             $matchcommentry->bowler_id = $baller_id;
             $matchcommentry->ball_number = $commentries['ball'];
-            $matchcommentry->ball_type = outType($commentries['ballType']);
+            $matchcommentry->ball_type = bollType($commentries['ballType']);
             $matchcommentry->run = $commentries['ballRun'];
             $matchcommentry->is_boundary = $commentries['isBoundry'];
             $matchcommentry->is_out = $commentries['isOut'];
@@ -576,7 +576,7 @@ class MatchController extends BaseController
         
         $match_ids = MatchPlayer::where('player_id',$request->player_id);
         if(isset($request->is_match_all) && $request->is_match_all == 0){
-           $match_ids = $match_ids->where('team_id','<>',$request->team_id);
+           $match_ids = $match_ids->where('series_team_id','<>',$request->team_id);
         }
         $match_ids = $match_ids->get()->pluck('match_id');
         $matchh_ids = Matche::whereIn('id',$match_ids);

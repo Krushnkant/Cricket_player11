@@ -119,6 +119,7 @@
                                     <th>Wide</th>
                                     <th>Noball</th>
                                     <th>Economy Rate</th>
+                                    <th>Fantasy Point</th>
                                 </tr>
                                 </thead>
                                 <tfoot>
@@ -136,7 +137,8 @@
                                     <th>Wicket</th>
                                     <th>Wide</th>
                                     <th>Noball</th>
-                                    <th>Economy Rate</th>  
+                                    <th>Economy Rate</th>
+                                    <th>Fantasy Point</th>
                                 </tr>
                                 </tfoot>
                             </table>
@@ -442,13 +444,13 @@ function matchs_table(is_clearState=false){
             // "dataSrc": ""
         },
         'columnDefs': [
-            { "width": "50px", "targets": 0 },
-            { "width": "120px", "targets": 1 },
-            { "width": "100px", "targets": 2 },
-            { "width": "100px", "targets": 3 },
-            { "width": "100px", "targets": 4 },
-            { "width": "100px", "targets": 5 },
-            { "width": "100px", "targets": 6 },
+            { "width": "10%", "targets": 0 },
+            { "width": "15%", "targets": 1 },
+            { "width": "15%", "targets": 2 },
+            { "width": "15%", "targets": 3 },
+            { "width": "13%", "targets": 4 },
+            { "width": "12%", "targets": 5 },
+            { "width": "20%", "targets": 6 },
         ],
         "columns": [
             {data: 'id', question: 'id', class: "text-center", orderable: false,
@@ -558,6 +560,7 @@ function match_scoreboard(is_clearState=false){
             { "width": "10px", "targets": 11 },
             { "width": "10px", "targets": 12 },
             { "width": "10px", "targets": 13 },
+            { "width": "10px", "targets": 14 },
         ],
         "columns": [
             {data: 'id', question: 'id', class: "text-center", orderable: false,
@@ -578,6 +581,7 @@ function match_scoreboard(is_clearState=false){
             {data: 'wide', name: 'wide', class: "text-left multirow" , orderable: false},
             {data: 'noball', name: 'noball', class: "text-left multirow" , orderable: false},
             {data: 'economy_rate', name: 'economy_rate', class: "text-left multirow" , orderable: false},
+            {data: 'fantasy_point', name: 'fantasy_point', class: "text-left multirow" , orderable: true},
         ]
     });
 }
@@ -651,6 +655,44 @@ $('body').on('click', '#RemovematchSubmit', function (e) {
             $("#RemovematchSubmit").find('.removeloadericonfa').hide();
             matchs_table();
             toastr.error("Please try again",'Error',{timeOut: 5000});
+        }
+    });
+});
+
+$('body').on('click', '#countFantasyPoints', function (e) {
+    $('#countFantasyPoints').prop('disabled',true);
+    $(this).find('#fantasy_btn_icon').hide();
+    $(this).find('#fantasy_btn_loader').show();
+    e.preventDefault();
+    var match_id = $(this).attr('data-id');
+    
+    $.ajax({
+        type: 'GET',
+        url: "{{ url('admin/match') }}" +'/' + match_id +'/countfantaypoint',
+        success: function (res) {
+            if(res.status == 200){
+                $('#countFantasyPoints').prop('disabled',false);
+                $(this).find('#fantasy_btn_icon').show();
+                $(this).find('#fantasy_btn_loader').hide();
+                matchs_table();
+                toastr.success("Fantasy Points has been Calculated successfully",'Success',{timeOut: 5000});
+            }
+
+            if(res.status == 404 || res.status == 400){
+                $('#countFantasyPoints').prop('disabled',false);
+                $(this).find('#fantasy_btn_icon').show();
+                $(this).find('#fantasy_btn_loader').hide();
+                matchs_table();
+                toastr.error(res.msg,'Error',{timeOut: 5000});
+            }
+            
+        },
+        error: function (data) {
+            $('#countFantasyPoints').prop('disabled',false);
+            $(this).find('#fantasy_btn_icon').show();
+            $(this).find('#fantasy_btn_loader').hide();
+            matchs_table();
+            toastr.error("Something went wrong. Please try again",'Error',{timeOut: 5000});
         }
     });
 });

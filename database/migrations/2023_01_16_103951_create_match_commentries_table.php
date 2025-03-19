@@ -25,7 +25,7 @@ return new class extends Migration
             $table->integer('run')->default(0);
             $table->integer('is_boundary')->default(0)->comment('0->No,1->Yes'); 
             $table->integer('is_out')->default(0)->comment('0->No,1->Yes'); 
-            $table->integer('out_type')->default(0)->comment('1->lbw,2->hit_wkt,3->caught_bowled,4->caught,5->bowled,6->stumped,7->run_out,51->other'); 
+            $table->integer('out_type')->default(0)->comment('1->bowled, 2->caught, 3->run_out, 4->hit_wkt, 5->lbw, 6->caught_bowled, 7->stumped'); 
             $table->text('out_by_fielder1_id')->nullable();
             $table->text('out_by_fielder2_id')->nullable();
             $table->integer('run_out_batsman_id')->nullable();

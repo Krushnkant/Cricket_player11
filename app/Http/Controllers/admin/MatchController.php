@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Matche;
 use App\Models\MatchPlayer;
+use App\Models\Player;
 use App\Models\SeriesTeamPlayer;
 use App\Models\Series;
 use App\Models\SeriesTeam;
@@ -35,8 +36,8 @@ class MatchController extends Controller
         $seriesteamplayer1 = SeriesTeamPlayer::where('series_team_id', $seriesteams1->id)->get();
         $seriesteamplayer2 = SeriesTeamPlayer::where('series_team_id', $seriesteams2->id)->get();
 
-        $matchplayer1 = MatchPlayer::where('match_id',$id)->where('team_id',$match->team1_id)->get()->pluck('player_id')->toArray();
-        $matchplayer2 = MatchPlayer::where('match_id',$id)->where('team_id',$match->team2_id)->get()->pluck('player_id')->toArray();
+        $matchplayer1 = MatchPlayer::where('match_id',$id)->where('series_team_id',$match->team1_id)->get()->pluck('player_id')->toArray();
+        $matchplayer2 = MatchPlayer::where('match_id',$id)->where('series_team_id',$match->team2_id)->get()->pluck('player_id')->toArray();
         if($matchplayer1 == ""){
             $matchplayer1 = array();
         }
@@ -253,9 +254,10 @@ class MatchController extends Controller
                     $action='';
                     if ( getUSerRole()==1 || (getUSerRole()!=1 && is_write($page_id)) ){
                         $action .= '<button id="editmatchBtn" class="btn btn-gray text-blue btn-sm" data-id="' .$Match->id. '"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
-                        $action .= '<button id="editmatchplayerBtn" title="Match Player" class="btn btn-gray text-blue btn-sm" data-toggle="modal" data-target="#matchplayerModel" onclick="" data-id="' .$Match->id. '"><i class="fa fa-users" aria-hidden="true"></i></button>';
+                        $action .= '<button id="editmatchplayerBtn" title="Match Players" class="btn btn-gray text-blue btn-sm" data-toggle="modal" data-target="#matchplayerModel" onclick="" data-id="' .$Match->id. '"><i class="fa fa-users" aria-hidden="true"></i></button>';
                         $action .= '<button id="viewMatchCommentriesBtn" title="Commentry" class="btn btn-gray text-blue btn-sm"  data-id="' .$Match->id. '"><i class="fa fa-comment" aria-hidden="true"></i></button>';
-                        $action .= '<button id="viewMatchScoreboardsBtn" title="Scoreboards" class="btn btn-gray text-blue btn-sm"  data-id="' .$Match->id. '"><i class="fa fa-star" aria-hidden="true"></i></button>';
+                        $action .= '<button id="viewMatchScoreboardsBtn" title="Score Board" class="btn btn-gray text-blue btn-sm"  data-id="' .$Match->id. '"><i class="fa fa-signal" aria-hidden="true"></i></button>';
+                        $action .= '<button id="countFantasyPoints" title="Calculate Fantasy Points" class="btn btn-gray text-blue btn-sm"  data-id="' .$Match->id. '"><i id="fantasy_btn_icon" class="fa fa-star" aria-hidden="true"></i><i id="fantasy_btn_loader" class="fa fa-circle-o-notch fa-spin loadericonfa" style="display:none; margin-left: 0;"></i></button>';
                     }
                     $action .= '<button id="deletematchBtn" class="btn btn-gray text-danger btn-sm" data-toggle="modal" data-target="#DeletematchModal" data-id="' .$Match->id. '"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
                     
@@ -450,19 +452,20 @@ class MatchController extends Controller
             {
                 foreach ($Matche as $Match)
                 {
-                    $nestedData['player_id'] = isset($Match->player)?$Match->player->name:"";
-                    $nestedData['ball'] = ($Match->ball != "")?$Match->ball:"-";;
-                    $nestedData['run'] = ($Match->run != "")?$Match->run:"-";;
-                    $nestedData['four'] = ($Match->four != "")?$Match->four:"-";;
-                    $nestedData['six'] = ($Match->six != "")?$Match->six:"-";;
-                    $nestedData['strike_rate'] = ($Match->strike_rate != "")?$Match->strike_rate:"-";;
-                    $nestedData['over'] = ($Match->over != "")?$Match->over:"-";;
-                    $nestedData['ball_run'] = ($Match->ball_run != "")?$Match->ball_run:"-";;
-                    $nestedData['maiden'] = ($Match->maiden != "")?$Match->maiden:"-";;
-                    $nestedData['wicket'] = ($Match->wicket != "")?$Match->wicket:"-";;
-                    $nestedData['wide'] = ($Match->wide != "")?$Match->wide:"-";;
-                    $nestedData['noball'] = ($Match->noball != "")?$Match->noball:"-";;
-                    $nestedData['economy_rate'] = ($Match->economy_rate != "")?$Match->economy_rate:"-";;
+                    $nestedData['player_id']        = isset($Match->player) ? $Match->player->name : "";
+                    $nestedData['ball']             = ($Match->ball != "") ? $Match->ball : "-";
+                    $nestedData['run']              = ($Match->run != "") ? $Match->run : "-";
+                    $nestedData['four']             = ($Match->four != "") ? $Match->four : "-";
+                    $nestedData['six']              = ($Match->six != "") ? $Match->six : "-";
+                    $nestedData['strike_rate']      = ($Match->strike_rate != "") ? $Match->strike_rate : "-";
+                    $nestedData['over']             = ($Match->over != "") ? $Match->over : "-";
+                    $nestedData['ball_run']         = ($Match->ball_run != "") ? $Match->ball_run : "-";
+                    $nestedData['maiden']           = ($Match->maiden != "") ? $Match->maiden : "-";
+                    $nestedData['wicket']           = ($Match->wicket != "") ? $Match->wicket : "-";
+                    $nestedData['wide']             = ($Match->wide != "") ? $Match->wide : "-";
+                    $nestedData['noball']           = ($Match->noball != "") ? $Match->noball : "-";
+                    $nestedData['economy_rate']     = ($Match->economy_rate != "") ? $Match->economy_rate : "-";
+                    $nestedData['fantasy_point']    = ($Match->fantasy_point != "") ? $Match->fantasy_point: "-";
                     
                     $data[] = $nestedData;
                 }
@@ -500,7 +503,7 @@ class MatchController extends Controller
     }
 
     public function deletematch($id){
-        $Faqform = Matche::where('id',$id)->first();
+        $Faqform = Matche::where('id', $id)->first();
         if ($Faqform){
             $Faqform->estatus = 3;
             $Faqform->save();
@@ -508,6 +511,21 @@ class MatchController extends Controller
             return response()->json(['status' => '200']);
         }
         return response()->json(['status' => '400']);
+    }
+
+    public function countfantaypoint($id){
+        
+        $calculateFantasyPoint = calculateFantasyPoint($id);
+        $MatchCommentryData = MatchCommentry::where('match_id', $id)->get();
+        $MatchScoreboardData = MatchScoreboard::where('match_id',$id)->get();
+        if($calculateFantasyPoint == 2) {
+            return response()->json(['msg' => 'Match not found.', 'status' => '404']);
+            
+
+        } else if($calculateFantasyPoint == 1) {
+            return response()->json(['msg' => 'Fantasy point has been updated successfully.','status' => '200']);
+        }
+        return response()->json(['msg' => 'Something went wrong. Please try again.', 'status' => '400']);
     }
 
 }

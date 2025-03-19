@@ -40,6 +40,7 @@ Route::group(['prefix'=>'admin','middleware'=>['auth','userpermission'],'as'=>'a
         Route::post('allmatchlist',[\App\Http\Controllers\admin\MatchController::class,'allmatchlist'])->name('allmatchlist');
         Route::get('match/{id}/edit',[\App\Http\Controllers\admin\MatchController::class,'editmatch'])->name('match.edit');
         Route::get('match/{id}/delete',[\App\Http\Controllers\admin\MatchController::class,'deletematch'])->name('match.delete');
+        Route::get('match/{id}/countfantaypoint',[\App\Http\Controllers\admin\MatchController::class,'countfantaypoint'])->name('match.countfantaypoint');
 
         Route::post('matchplayer/save',[\App\Http\Controllers\admin\MatchController::class,'savematchplayer'])->name('matchplayer.save');
 
