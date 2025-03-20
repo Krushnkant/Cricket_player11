@@ -410,27 +410,27 @@ function calculateFantasyPoint($match_id){
             // Strike Rate (Except Bowler) Points (Min 10 Balls To Be Played)
             if($playedBall >= 10 && $playerType != 2){
 
-                if($playedBall == 100 && $totalStrikeRate >= 170){
+                if($totalStrikeRate >= 170){
                     // Bonus Point for Below 5 runs per over
                     $total_fantasy_point += 6;
 
-                } else if($playedBall == 100 && $totalStrikeRate >= 150.01 && $totalStrikeRate <= 170){
+                } else if($totalStrikeRate >= 150.01 && $totalStrikeRate <= 170){
                     // Bonus Point for Below 5 runs per over
                     $total_fantasy_point += 4;
 
-                } else if($playedBall == 100 && $totalStrikeRate >= 130 && $totalStrikeRate <= 150){
+                } else if($totalStrikeRate >= 130 && $totalStrikeRate <= 150){
                     // Bonus Point for Below 5 runs per over
                     $total_fantasy_point += 2;
 
-                } else if($playedBall == 100 && $totalStrikeRate >= 60 && $totalStrikeRate <= 70){
+                } else if($totalStrikeRate >= 60 && $totalStrikeRate <= 70){
                     // Bonus Point for Below 5 runs per over
                     $total_fantasy_point -= 2;
                     
-                } else if($playedBall == 100 && $totalStrikeRate >= 50 && $totalStrikeRate <= 59.99){
+                } else if($totalStrikeRate >= 50 && $totalStrikeRate <= 59.99){
                     // Bonus Point for Below 5 runs per over
                     $total_fantasy_point -= 4;
 
-                }  else if($playedBall == 100 && $totalStrikeRate <= 50){
+                }  else if($totalStrikeRate <= 50){
                     // Bonus Point for Below 5 runs per over
                     $total_fantasy_point -= 6;
                 }
