@@ -16,4 +16,9 @@ class Series extends Model
     public function series_team(){
         return $this->hasMany(SeriesTeam::class,'series_id','id');
     }
+
+    public function teams()
+    {
+        return $this->hasMany(SeriesTeam::class, 'series_id');
+    }
 }

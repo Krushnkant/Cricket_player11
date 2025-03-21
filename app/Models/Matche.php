@@ -24,4 +24,8 @@ class Matche extends Model
     public function stadium(){
         return $this->hasOne(Stadium::class,'id','stadium_id');
     }
+
+    public function win_team(){
+        return $this->hasOne(Team::class,'id','win_team_id');
+    }
 }

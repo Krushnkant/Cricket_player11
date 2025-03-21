@@ -9,6 +9,7 @@ use App\Models\CustomerDeviceToken;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends BaseController
 {
@@ -35,7 +36,7 @@ class AuthController extends BaseController
             if($user->first_name == ""){
                 $data['user_status'] = 'new_user';
             }else{
-                $data['user_status'] = 'exist_user';    
+                $data['user_status'] = 'exist_user';
             }
             $final_data = array();
             array_push($final_data,$data);
@@ -44,10 +45,10 @@ class AuthController extends BaseController
             return $this->sendResponseWithData($final_data, 'User login successfully.');
         }else{
             $data['otp'] =  mt_rand(100000,999999);
-            
+
             $user = new User();
             $user->mobile_no = $mobile_no;
-           
+
             $user->role = 3;
             $user->otp = $data['otp'];
             $user->otp_created_at = Carbon::now();
@@ -120,7 +121,7 @@ class AuthController extends BaseController
             $device->device_type = $request->device_type;
         }
         $device->save();
-        
+
         return $this->sendResponseWithData($user,"Device Token updated.");
     }
 
@@ -130,7 +131,7 @@ class AuthController extends BaseController
         if ($user)
         {
             // $user->last_login_date = new \DateTime(null, new \DateTimeZone('Asia/Kolkata'));
-            // $user->save(); 
+            // $user->save();
 
             $userlogin = New UserLogin();
             $userlogin->user_id =  $user->id;
@@ -146,6 +147,100 @@ class AuthController extends BaseController
         }
     }
 
-    
+    public function loginWithGmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            // 'userId' => 'required|string',
+            'email' => 'required|email',
+            'firstName' => 'required|string',
+            'lastName' => 'required|string',
+            'profileUrl' => 'nullable|string',
+            'providerId' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError([], "Validation Error", $validator->errors());
+        }
+
+        // Find or create user
+        $user = User::updateOrCreate(
+            ['email' => $request->email],
+            [
+                'user_id' => $request->userId,
+                'first_name' => $request->firstName,
+                'last_name' => $request->lastName,
+                'profile_url' => $request->profileUrl,
+                'provider_id' => $request->providerId,
+            ]
+        );
+
+
+        // Generate token
+        $token = $user->createToken('P00j@13579WebV#d@n%p')->accessToken;
+
+         // Check if user has an active coupon
+         $userCoupon = DB::table('user_coupon')
+         ->where('user_id', $user->id)
+         ->where('estatus', 1) // Active status (1 = Active)
+         ->where('expiry_date', '>=', now()) // Ensure coupon is not expired
+         ->first();
+
+        // Determine coupon availability
+        $isCouponAvailable = $userCoupon ? true : false;
+        $couponCode = $userCoupon->coupon_code ?? null;
+
+        $temp['userId'] = $user->id;
+        $temp['userType'] = $user->eUserType;
+        $temp['isCouponCodeAvailable'] = $isCouponAvailable;
+        $temp['couponCode'] = $couponCode;
+
+        return $this->sendResponseWithData(['token' => $token, 'user' => $temp], "Login successful");
+    }
+
+    /**
+     * Login with Email & Password
+     */
+    public function loginWithEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'userId' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string',
+            'firstName' => 'required|string',
+            'lastName' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError([], "Validation Error", $validator->errors());
+        }
+
+        // Find user
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return $this->sendError([], "Invalid credentials");
+        }
+
+         // Generate token
+         $token = $user->createToken('P00j@13579WebV#d@n%p')->accessToken;
+
+         // Check if user has an active coupon
+         $userCoupon = DB::table('user_coupon')
+         ->where('user_id', $user->id)
+         ->where('estatus', 1) // Active status (1 = Active)
+         ->where('expiry_date', '>=', now()) // Ensure coupon is not expired
+         ->first();
+
+        // Determine coupon availability
+        $isCouponAvailable = $userCoupon ? true : false;
+        $couponCode = $userCoupon->coupon_code ?? null;
+
+        $temp['userId'] = $user->id;
+        $temp['userType'] = $user->eUserType;
+        $temp['isCouponCodeAvailable'] = $isCouponAvailable;
+        $temp['couponCode'] = $couponCode;
+
+        return $this->sendResponseWithData(['token' => $token, 'user' => $temp], "Login successful");
+    }
 
 }

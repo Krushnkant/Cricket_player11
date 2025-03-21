@@ -39,3 +39,12 @@ Route::post('teamvsteam',[MatchController::class,'teamvsteam']);
 Route::post('playervsplayer',[MatchController::class,'playervsplayer']);
 Route::post('playervsteam',[MatchController::class,'playervsteam']);
 Route::post('player_profile',[MatchController::class,'player_profile']);
+
+Route::post('splash_data',[MatchController::class,'splashData']);
+Route::post('login-with-gmail', [AuthController::class, 'loginWithGmail']);
+Route::post('login-with-email', [AuthController::class, 'loginWithEmail']);
+
+Route::post('get-series', [MatchController::class, 'getSeries']);
+Route::post('/news', [MatchController::class, 'newsList']);
+
+Route::post('series-team', [MatchController::class, 'getSeriesTeam']);

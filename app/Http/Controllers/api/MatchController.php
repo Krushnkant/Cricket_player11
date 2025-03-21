@@ -16,13 +16,17 @@ use App\Models\Team;
 use App\Models\Series;
 use App\Models\Stadium;
 use App\Models\Tournament;
+use App\Models\User;
+use App\Models\News;
+use App\Models\AppOpenLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class MatchController extends BaseController
 {
     public function players(Request $request){
-       
+
         $validator = Validator::make($request->all(), [
             'match_id' => 'required',
             'players' => 'required',
@@ -31,14 +35,14 @@ class MatchController extends BaseController
         if($validator->fails()){
             return $this->sendError($validator->errors(), "Validation Errors", []);
         }
-     
+
         if(count($request->players) == 2){
             $country1_id = 0;
             $team_id = 0;
             $SeriesT_id = 0;
             foreach($request->players as $player){
-              
-                foreach($player as $key => $player){ 
+
+                foreach($player as $key => $player){
                     $matche =  Matche::with('series.tournament')->where('id',$request->match_id)->first();
                     if($key == 0){
                         $country1 = Country::where('name',$player)->first();
@@ -48,7 +52,7 @@ class MatchController extends BaseController
                             $cou1->save();
                             $country1_id = $cou1->id;
                         }else{
-                            $country1_id = $country1->id; 
+                            $country1_id = $country1->id;
                         }
 
                         $team = Team::where('name',$player)->first();
@@ -59,7 +63,7 @@ class MatchController extends BaseController
                             $team->save();
                             $team_id = $team->id;
                         }else{
-                            $team_id = $country1->id; 
+                            $team_id = $country1->id;
                         }
 
                         if(isset($matche->series->id) && $team_id > 0){
@@ -71,7 +75,7 @@ class MatchController extends BaseController
                                 $SeriesT->save();
                                 $SeriesT_id = $SeriesT->id;
                             }else{
-                                $SeriesT_id = $SeriesTeam->id; 
+                                $SeriesT_id = $SeriesTeam->id;
                             }
                         }
 
@@ -84,7 +88,7 @@ class MatchController extends BaseController
                             $player1->save();
                             $player1_id = $player1->id;
                         }else{
-                            $player1_id = $player1s->id; 
+                            $player1_id = $player1s->id;
                         }
 
                         $seriesteam = SeriesTeamPlayer::where('player_id',$player1_id)->where('series_team_id',1)->first();
@@ -109,7 +113,7 @@ class MatchController extends BaseController
         }
         return $this->sendResponseSuccess("Players Added.");
     }
-    
+
     public function match_commentries(Request $request){
         //dd($request->all());
         $validator = Validator::make($request->all(), [
@@ -120,9 +124,9 @@ class MatchController extends BaseController
         if($validator->fails()){
             return $this->sendError($validator->errors(), "Validation Errors", []);
         }
-        
+
         foreach($request->match_commentries as $commentries){
-           
+
             $batsmanplayer = Player::where('name',$commentries['batsman'])->first();
             if (!$batsmanplayer){
                 $player = new Player();
@@ -130,9 +134,9 @@ class MatchController extends BaseController
                 $player->save();
                 $batsman_id = $player->id;
             }else{
-                $batsman_id = $batsmanplayer->id; 
+                $batsman_id = $batsmanplayer->id;
             }
-           
+
 
             $ballerplayer = Player::where('name',$commentries['baller'])->first();
             if (!$ballerplayer){
@@ -143,7 +147,7 @@ class MatchController extends BaseController
             }else{
                 $baller_id = $ballerplayer->id;
             }
-            
+
             if($commentries['runOutPlayer'] != "" && $commentries['runOutPlayer'] != null){
                 $ballerplayer = Player::where('name',$commentries['runOutPlayer'])->first();
                 if (!$ballerplayer){
@@ -155,7 +159,7 @@ class MatchController extends BaseController
                     $runOutPlayer = $ballerplayer->id;
                 }
             }else{
-               $runOutPlayer = 0; 
+               $runOutPlayer = 0;
             }
 
             $runOutPlayer1 = array();
@@ -173,8 +177,8 @@ class MatchController extends BaseController
                     }
                 }
             }
-            
-        
+
+
             $matchcommentry = new MatchCommentry();
             $matchcommentry->match_id = $request->match_id;
             $matchcommentry->batsman_id = $batsman_id;
@@ -193,7 +197,7 @@ class MatchController extends BaseController
             $matchcommentry->commentry = $commentries['commentry'];
             $matchcommentry->save();
         }
-        
+
         return $this->sendResponseSuccess("Commentry Added.");
     }
 
@@ -207,9 +211,9 @@ class MatchController extends BaseController
         if($validator->fails()){
             return $this->sendError($validator->errors(), "Validation Errors", []);
         }
-        
+
         foreach($request->match_scoreboards as $scoreboards){
-           
+
             $batsmanplayer = Player::where('name',$scoreboards['Player'])->first();
             if (!$batsmanplayer){
                 $player = new Player();
@@ -217,9 +221,9 @@ class MatchController extends BaseController
                 $player->save();
                 $player_id = $player->id;
             }else{
-                $player_id = $batsmanplayer->id; 
+                $player_id = $batsmanplayer->id;
             }
-           
+
             $matchcommentry = new MatchScoreboard();
             $matchcommentry->match_id = $request->match_id;
             $matchcommentry->player_id = $player_id;
@@ -237,14 +241,14 @@ class MatchController extends BaseController
             $matchcommentry->economy_rate = $scoreboards['bowlingEco'];
             $matchcommentry->save();
         }
-        
+
         return $this->sendResponseSuccess("Scoreboards Added.");
     }
 
     public function match(Request $request){
-       
+
         $MatchCommentries =  MatchCommentry::select('bat.name as batsman_name','bol.name as bowler_name','match_commentries.*')->leftJoin('players as bat', 'bat.id', '=', 'match_commentries.batsman_id')->leftJoin('players as bol', 'bol.id', '=', 'match_commentries.bowler_id')->where('match_commentries.match_id',1)->get();
-      
+
         $data['MatchCommentries'] = $MatchCommentries;
 
         $MatchScoreboard =  MatchScoreboard::select('bat.name as player_name','match_scoreboards.*')->leftJoin('players as bat', 'bat.id', '=', 'match_scoreboards.player_id')->where('match_scoreboards.match_id',1)->get();
@@ -282,7 +286,7 @@ class MatchController extends BaseController
 
     public function upcoming_series(Request $request){
         $limit = ($request->upcominglimit)?$request->upcominglimit:6;
-   
+
         $upcomingseries =  Series::where('start_date', '>=', now()->toDateTimeString())->orderBy('start_date','ASC')->paginate($limit);
         $upcoming_series_arr = array();
         foreach ($upcomingseries as $serie){
@@ -300,37 +304,104 @@ class MatchController extends BaseController
         return $this->sendResponseWithData($data,"Upcoming Series Retrieved Successfully.");
     }
 
-    public function matchlist(Request $request){
-        $series = Series::where('id',$request->serie_id)->first();
-        if (!$series){
-            return $this->sendError("Series Not Exist", "Not Found Error", []);
+    // public function matchlist(Request $request){
+    //     $series = Series::where('id',$request->serie_id)->first();
+    //     if (!$series){
+    //         return $this->sendError("Series Not Exist", "Not Found Error", []);
+    //     }
+
+    //     $matches =  Matche::where('series_id',$request->serie_id)->where('estatus',1)->get();
+    //     $matches_arr = array();
+    //     foreach ($matches as $match){
+    //         $temp = array();
+    //         $temp['id'] = $match->id;
+    //         $temp['serie'] = isset($match->series)?$match->series->name:"";
+    //         $temp['serie_type'] = matchType(isset($match->series)?$match->series->series_type:0);
+    //         $temp['tournament'] = isset($match->series->tournament)?$match->series->tournament->name:"";
+    //         $temp['team1_id'] = $match->team1_id;
+    //         $temp['team1'] = isset($match->team1)?$match->team1->name:"";
+    //         $temp['team1_image'] = isset($match->team1)?url('images/team/'.$match->team1->thumb_img):"";
+    //         $temp['team2_id'] = $match->team2_id;
+    //         $temp['team2'] = isset($match->team2)?$match->team2->name:"";
+    //         $temp['team2_image'] = isset($match->team2)?url('images/team/'.$match->team2->thumb_img):"";
+    //         $temp['stadium'] = isset($match->stadium)?$match->stadium->name:"";
+    //         $temp['stadium_country'] = isset($match->stadium->coutry)?$match->stadium->coutry->name:"";
+    //         $temp['stadium_state'] = isset($match->stadium)?$match->stadium->state:"";
+    //         $temp['stadium_city'] = isset($match->stadium)?$match->stadium->city:"";
+    //         $temp['match_type'] = matchType($match->match_type);
+    //         $temp['start_date'] = $match->start_date;
+    //         array_push($matches_arr,$temp);
+    //     }
+    //     $data['matches'] = $matches_arr;
+    //     return $this->sendResponseWithData($data,"Matches Retrieved Successfully.");
+    // }
+
+    public function matchList(Request $request)
+    {
+        // Validate request
+        $validator = Validator::make($request->all(), [
+            'seriesId' => 'required|integer',
+            'eFormat' => 'nullable|string',
+            'limit' => 'nullable|integer'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError([], "Validation Error", $validator->errors());
         }
 
-        $matches =  Matche::where('series_id',$request->serie_id)->where('estatus',1)->get();
-        $matches_arr = array();
-        foreach ($matches as $match){
-            $temp = array();
-            $temp['id'] = $match->id;
-            $temp['serie'] = isset($match->series)?$match->series->name:"";
-            $temp['serie_type'] = matchType(isset($match->series)?$match->series->series_type:0);
-            $temp['tournament'] = isset($match->series->tournament)?$match->series->tournament->name:"";
-            $temp['team1_id'] = $match->team1_id;
-            $temp['team1'] = isset($match->team1)?$match->team1->name:"";
-            $temp['team1_image'] = isset($match->team1)?url('images/team/'.$match->team1->thumb_img):"";
-            $temp['team2_id'] = $match->team2_id;
-            $temp['team2'] = isset($match->team2)?$match->team2->name:"";
-            $temp['team2_image'] = isset($match->team2)?url('images/team/'.$match->team2->thumb_img):"";
-            $temp['stadium'] = isset($match->stadium)?$match->stadium->name:"";
-            $temp['stadium_country'] = isset($match->stadium->coutry)?$match->stadium->coutry->name:"";
-            $temp['stadium_state'] = isset($match->stadium)?$match->stadium->state:"";
-            $temp['stadium_city'] = isset($match->stadium)?$match->stadium->city:"";
-            $temp['match_type'] = matchType($match->match_type);
-            $temp['start_date'] = $match->start_date;
-            array_push($matches_arr,$temp);
+        // Query Matches
+        $query = Matche::where('estatus', 1);
+
+        // If seriesId is not 0, filter by seriesId
+        if ($request->seriesId != 0) {
+            $query->where('series_id', $request->seriesId);
         }
-        $data['matches'] = $matches_arr;
-        return $this->sendResponseWithData($data,"Matches Retrieved Successfully.");
+
+        // Apply eFormat filter
+        if ($request->eFormat) {
+            $query->where('eFormat', $request->eFormat);
+        }
+
+        // Apply limit filter
+        if ($request->limit) {
+            $query->limit($request->limit);
+        }
+
+        // Fetch Matches with Relationships
+        $matches = $query->get()->map(function ($match) {
+            return [
+                'matchId' => $match->id,
+                'seriesId' => $match->series_id,
+                'matchTitle' => $match->title ?? "",
+                'seriesTeam1Id' => $match->team1_id,
+                'team1Id' => $match->team1_id,
+                'team1Name' => $match->team1->name ?? "",
+                'team1ShortName' => $match->team1->short_name ?? "",
+                'team1Logo' => isset($match->team1) ? url('images/team/' . $match->team1->thumb_img) : "",
+                'seriesTeam2Id' => $match->team2_id,
+                'team2Id' => $match->team2_id,
+                'team2Name' => $match->team2->name ?? "",
+                'team2ShortName' => $match->team2->short_name ?? "",
+                'team2Logo' => isset($match->team2) ? url('images/team/' . $match->team2->thumb_img) : "",
+                'eFormat' => matchType($match->eformat),
+                'stadiumName' => $match->stadium->name ?? "",
+                'stadiumLocation' => trim(implode(', ', array_filter([
+                    $match->stadium->city ?? "",
+                    $match->stadium->state ?? "",
+                    $match->stadium->coutry->name ?? "",
+                ]))),
+                'matchTime' => $match->start_date,
+                'team1Score' => $match->team1_score ?? "",
+                'team2Score' => $match->team2_score ?? "",
+                'winningText' => $match->win_text ?? "",
+                'winningTeam' => $match->win_team->name ?? ""
+            ];
+        });
+
+        // Return Response
+        return $this->sendResponseWithData($matches, "Matches retrieved successfully");
     }
+
 
     public function otherlist(Request $request){
         $tournaments =  Tournament::where('estatus',1)->get();
@@ -368,7 +439,7 @@ class MatchController extends BaseController
             $temp['city'] = isset($stadium->city)?$stadium->city:"";
             array_push($stadiums_arr,$temp);
         }
-         
+
         $match_type_arr = array();
         $match_type_arr[0]['id'] = 1;
         $match_type_arr[0]['name'] = "T20s";
@@ -382,6 +453,7 @@ class MatchController extends BaseController
     }
 
     public function teamvsteam(Request $request){
+      
         $totalmatches = Matche::where(function($q) use($request) {
             $q->where(['team1_id'=>$request->team1_id,'team2_id'=>$request->team2_id])
                ->orWhere(['team1_id'=>$request->team2_id,'team2_id'=>$request->team1_id]);
@@ -391,47 +463,47 @@ class MatchController extends BaseController
             }
             if(isset($request->stadium_id)){
                 $totalmatches = $totalmatches->where('stadium_id',$request->stadium_id);
-            }     
+            }
             $totalmatches = $totalmatches->count();
-       
+
         $team1_winner_matches = Matche::where(function($q) use($request) {
             $q->where(['team1_id'=>$request->team1_id,'team2_id'=>$request->team2_id])
                ->orWhere(['team1_id'=>$request->team2_id,'team2_id'=>$request->team1_id]);
-             })->where('winner_team_id',$request->team1_id);
+             })->where('win_team_id',$request->team1_id);
              if(isset($request->match_type)){
                  $team1_winner_matches = $team1_winner_matches->where('match_type',$request->match_type);
              }
              if(isset($request->stadium_id)){
                  $team1_winner_matches = $team1_winner_matches->where('stadium_id',$request->stadium_id);
-             }     
+             }
              $team1_winner_matches = $team1_winner_matches->count();
-        
+
         $team2_winner_matches = Matche::where(function($q) use($request) {
             $q->where(['team1_id'=>$request->team1_id,'team2_id'=>$request->team2_id])
                 ->orWhere(['team1_id'=>$request->team2_id,'team2_id'=>$request->team1_id]);
-                })->where('winner_team_id',$request->team2_id);
+                })->where('win_team_id',$request->team2_id);
                 if(isset($request->match_type)){
                     $team2_winner_matches = $team2_winner_matches->where('match_type',$request->match_type);
                 }
                 if(isset($request->stadium_id)){
                     $team2_winner_matches = $team2_winner_matches->where('stadium_id',$request->stadium_id);
-                }     
-                $team2_winner_matches = $team2_winner_matches->count(); 
-            
+                }
+                $team2_winner_matches = $team2_winner_matches->count();
+
         $noresultmatches = Matche::where(function($q) use($request) {
             $q->where(['team1_id'=>$request->team1_id,'team2_id'=>$request->team2_id])
                 ->orWhere(['team1_id'=>$request->team2_id,'team2_id'=>$request->team1_id]);
-                })->where('winner_team_id',0);
+                })->where('win_team_id',0);
                 if(isset($request->match_type)){
                     $noresultmatches = $noresultmatches->where('match_type',$request->match_type);
                 }
                 if(isset($request->stadium_id)){
                     $noresultmatches = $noresultmatches->where('stadium_id',$request->stadium_id);
-                }     
-                $noresultmatches = $noresultmatches->count();    
+                }
+                $noresultmatches = $noresultmatches->count();
 
-                
-      
+
+
         $data['total_matches'] = $totalmatches;
         $data['team1_winner_matches'] = $team1_winner_matches;
         $data['team1_loss_matches'] = $team2_winner_matches;
@@ -448,8 +520,8 @@ class MatchController extends BaseController
                 }
                 if(isset($request->stadium_id)){
                     $matches = $matches->where('stadium_id',$request->stadium_id);
-                }     
-                $matches = $matches->get(); 
+                }
+                $matches = $matches->get();
 
         $matches_arr = array();
         foreach ($matches as $match){
@@ -469,7 +541,7 @@ class MatchController extends BaseController
             $temp['stadium_state'] = isset($match->stadium)?$match->stadium->state:"";
             $temp['stadium_city'] = isset($match->stadium)?$match->stadium->city:"";
             $temp['match_type'] = matchType($match->match_type);
-            $temp['winner_team_id'] = $match->winner_team_id;
+            $temp['winner_team_id'] = $match->win_team_id;
             $temp['team1_score'] = $match->team1_score;
             $temp['team2_score'] = $match->team2_score;
             $temp['winning_statement'] = $match->winning_statement;
@@ -524,7 +596,7 @@ class MatchController extends BaseController
             }
             if(isset($request->stadium_id)){
                 $matchcommentries = $matchcommentries->where('stadium_id',$request->stadium_id);
-            }     
+            }
             $matchcommentries = $matchcommentries->get();
 
             $ballfaced = $matchcommentries->count();
@@ -550,7 +622,7 @@ class MatchController extends BaseController
             $data['runavg'] =   number_format((float)$runavg, 2, '.', '');
             $data['strikerate'] =   $this->strikerate($ballfaced,$match_runs);
 
-        
+
             $commentry_arr = array();
             foreach ($matchcommentries as $ball){
                 $temp = array();
@@ -573,7 +645,7 @@ class MatchController extends BaseController
 
     public function playervsteam(Request $request)
     {
-        
+
         $match_ids = MatchPlayer::where('player_id',$request->player_id);
         if(isset($request->is_match_all) && $request->is_match_all == 0){
            $match_ids = $match_ids->where('series_team_id','<>',$request->team_id);
@@ -585,19 +657,19 @@ class MatchController extends BaseController
         }
         if(isset($request->stadium_id)){
             $matchh_ids = $matchh_ids->where('stadium_id',$request->stadium_id);
-        } 
+        }
         $matchh_ids = $matchh_ids->where(function($q) use($request) {
             $q->where(['team1_id'=>$request->team_id])
                ->orWhere(['team2_id'=>$request->team_id]);
              })->get()->pluck('id');
-       
-        
+
+
         $matchcommentry = MatchCommentry::whereIn('match_id',$matchh_ids)->where('batsman_id',$request->player_id);
-                
+
             //$matchcommentries = $matchcommentries->distinct('match_id')->count();
             $matchcommentry = $matchcommentry->get();
 
-            $matchscoreboard = MatchScoreboard::whereIn('match_id',$matchh_ids)->where('player_id',$request->player_id)->get();    
+            $matchscoreboard = MatchScoreboard::whereIn('match_id',$matchh_ids)->where('player_id',$request->player_id)->get();
 
             $ballfaced = $matchscoreboard->sum('ball');
             $totalmatch = $matchscoreboard->count();
@@ -617,11 +689,11 @@ class MatchController extends BaseController
             $wide = $matchscoreboard->sum('wide');
             $noball = $matchscoreboard->sum('noball');
             $economy_rate = $matchscoreboard->avg('economy_rate');
-            
-          
+
+
             $higthest_runs = MatchCommentry::select([\DB::raw('SUM(run) AS score')])->whereIn('match_id',$matchh_ids)
-            ->where('batsman_id',$request->player_id)->groupBy('match_id')->get()->pluck('score')->toArray(); 
-           
+            ->where('batsman_id',$request->player_id)->groupBy('match_id')->get()->pluck('score')->toArray();
+
             $data['total_match'] =  $totalmatch;
             $data['match_runs'] =   $match_runs;
             $data['ballfaced'] =   $ballfaced;
@@ -642,7 +714,7 @@ class MatchController extends BaseController
             $data['noball'] =  $noball;
             $data['economy_rate'] =  $economy_rate;
 
-        
+
             $commentry_arr = array();
             foreach ($matchcommentry as $ball){
                 $temp = array();
@@ -668,7 +740,7 @@ class MatchController extends BaseController
         }
         if(isset($request->stadium_id)){
             $matchh_ids = $matchh_ids->where('stadium_id',$request->stadium_id);
-        } 
+        }
         $matchh_ids = $matchh_ids->get()->pluck('id');
 
         $temp = array();
@@ -680,7 +752,7 @@ class MatchController extends BaseController
         $temp['bowling_style'] = bowlingStyle($player->bowling_style);
         $temp['bowling_arm'] = bowlingArm($player->bowling_arm);
 
-        $matchscoreboard = MatchScoreboard::whereIn('match_id',$matchh_ids)->where('player_id',$request->player_id)->get();   
+        $matchscoreboard = MatchScoreboard::whereIn('match_id',$matchh_ids)->where('player_id',$request->player_id)->get();
 
         $temp['totalmatch'] = $matchscoreboard->count();
         $temp['match_runs'] = $matchscoreboard->sum('run');
@@ -689,8 +761,188 @@ class MatchController extends BaseController
         $temp['strikerate'] = $matchscoreboard->avg('strike_rate');
         $temp['maiden'] = $matchscoreboard->sum('maiden');
         $temp['wicket'] = $matchscoreboard->sum('wicket');
-   
+
         return $this->sendResponseWithData($temp,"Player Profile Retrieved Successfully.");
+    }
+
+    public function splashData(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'userId'          => 'nullable|integer',
+            'deviceId'        => 'required|string',
+            'eDeviceType'     => 'required|in:android,ios',
+            'brand'           => 'nullable|string',
+            'model'           => 'nullable|string',
+            'device'          => 'nullable|string',
+            'manufacturer'    => 'nullable|string',
+            'osVersion'       => 'nullable|string',
+            'appVersionName'  => 'nullable|string',
+            'utmReferrer'     => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError([], "Validation Error", $validator->errors());
+        }
+
+        if ($request->userId > 0) {
+            $user = User::find($request->userId);
+        } else {
+            $user = new User();
+            $user->device_id = $request->deviceId;
+            $user->provider_type = $request->eDeviceType;
+            $user->role = 3;
+            $user->save();
+        }
+
+        AppOpenLog::create([
+            'user_id'         => $user->id,
+            'device_id'       => $request->deviceId,
+            'device_type'     => $request->eDeviceType,
+            'brand'           => $request->brand,
+            'model'           => $request->model,
+            'device'          => $request->device,
+            'manufacturer'    => $request->manufacturer,
+            'os_version'      => $request->osVersion,
+            'app_version_name'=> $request->appVersionName,
+            'visit_time' => now()->format('H:i:s'),
+            // 'utm_referrer'    => $request->utmReferrer,
+            'created_at'      => Carbon::now(),
+        ]);
+
+        $userCoupon = DB::table('user_coupon')
+            ->where('user_id', $user->id)
+            ->where('estatus', 1)
+            ->where('expiry_date', '>=', now()) 
+            ->first();
+
+        $isCouponAvailable = $userCoupon ? true : false;
+        $couponCode = $userCoupon->coupon_code ?? null;
+
+        $temp['userId'] = $user->id;
+        $temp['userType'] = $user->eUserType;
+        $temp['isCouponCodeAvailable'] = $isCouponAvailable;
+        $temp['couponCode'] = $couponCode;
+        $temp['email'] = $user->email ?? '';
+        $temp['firstName'] = $user->first_name ?? '';
+        $temp['lastName'] = $user->last_name ?? '';
+        $temp['profileUrl'] = $user->profile_url ?? '';
+
+        return $this->sendResponseWithData($temp,"splash Data Retrieved Successfully.");
+    }
+
+    public function getSeries(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'tournamentId' => 'required|integer',
+            'eSeriesType' => 'nullable|integer',
+            'limit' => 'nullable|integer'
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError($validator->errors(), "Validation Errors", []);
+        }
+
+        $query = Series::query();
+
+        if ($request->tournamentId != 0) {
+            $query->where('tournament_id', $request->tournamentId);
+        }
+
+        if ($request->eSeriesType) {
+            $query->where('series_type', $request->eSeriesType);
+        }
+
+        if ($request->limit) {
+            $query->limit($request->limit);
+        }
+
+        $series = $query->get()->map(function ($s) {
+            return [
+                'seriesId' => $s->id,
+                'seriesName' => $s->name, // Assuming 'name' column exists
+                'startDate' => $s->start_date,
+                'endDate' => $s->end_date,
+                'tournamentName' => Tournament::where('id', $s->tournament_id)->value('name') ?? "N/A"
+            ];
+        });
+
+        return $this->sendResponseWithData($series, "Series retrieved successfully");
+    }
+
+    public function newsList(Request $request)
+    {
+        $query = News::where('estatus', 1); // Fetch only active news
+
+        // Apply limit filter
+        if ($request->has('limit')) {
+            $query->limit($request->limit);
+        }
+
+        $newsList = $query->get()->map(function ($news) {
+            return [
+                'newsId'          => $news->id,
+                'newsTitle'       => $news->news_title ?? "",
+                'newsImage'       => isset($news->thumb_img) ? url('images/news/' . $news->thumb_img) : "",
+                'newsDescription' => $news->description ?? "",
+                'newsLikes'       => $news->total_likes ?? 0,
+                'newsShare'       => $news->total_share ?? 0,
+            ];
+        });
+
+        return $this->sendResponseWithData($newsList, "News Retrieved Successfully.");
+    }
+
+    public function getSeriesTeam(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'seriesId' => 'required|integer',
+            'eFormate' => 'nullable|integer'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(), "Validation Errors", []);
+        }
+
+        $query = Series::where('id', $request->seriesId);
+
+        if ($request->eFormate) {
+            $query->where('eFormate', $request->eFormate);
+        }
+
+        $series = $query->with(['teams.players'])->first();
+
+        if (!$series) {
+            return $this->sendError([], "Series not found", []);
+        }
+
+        $response = [
+            'seriesId' => $series->id,
+            'eFormate' => matchType($series->series_type),
+            'lstSeriesTeam' => $series->teams->map(function ($team) {
+               
+                return [
+                    'teamId' => $team->team->id,
+                    'teamName' => $team->team->name,
+                    'teamShortName' => $team->team->short_name,
+                    'teamLogo' => isset($team->team)?url('images/team/'.$team->team->thumb_img):"",
+                    'lstTeamPlayer' => $team->players->map(function ($player) {
+                   
+                        return [
+                            'playerId' => $player->player->id,
+                            'playerName' => $player->player->name,
+                            'playerImg' => isset($player->$player->thumb_img)?url('images/player/'.$player->$player->thumb_img):"",
+                            'ePlayerType' => playerType($player->player->player_type),
+                            'eBattingStyle' => battingStyle($player->player->batting_style),
+                            'eBowlingStyle' => bowlingStyle($player->player->bowling_style),
+                            'eBowlingArm' => bowlingArm($player->player->bowling_arm)
+                        ];
+                    }),
+                ];
+            }),
+        ];
+
+        return $this->sendResponseWithData($response, "Series team data retrieved successfully");
     }
 
 }

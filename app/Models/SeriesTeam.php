@@ -12,4 +12,9 @@ class SeriesTeam extends Model
     public function team(){
         return $this->hasOne(Team::class,'id','team_id');
     }
+
+    public function players()
+    {
+        return $this->hasMany(SeriesTeamPlayer::class, 'series_team_id');
+    }
 }
