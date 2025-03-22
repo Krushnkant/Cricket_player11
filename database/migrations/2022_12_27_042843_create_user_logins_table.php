@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('user_logins', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->nullable();
+            $table->integer('user_id')->nullable()->index();
             $table->string('ip_address')->nullable();
             $table->string('country')->nullable();
             $table->string('state')->nullable();

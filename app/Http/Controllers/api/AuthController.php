@@ -6,6 +6,7 @@ use \Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserLogin;
 use App\Models\CustomerDeviceToken;
+use App\Models\LoginUser;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\UserResource;
@@ -16,15 +17,21 @@ class AuthController extends BaseController
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'mobile_no' => 'required'
+            'user_id'           => 'required',
+            'firebase_uid'      => 'required',
+            'device_id'         => 'required',
+            'edevice_type'      => 'required',
+            'app_version_name'  => 'required'
         ]);
 
         if($validator->fails()){
             return $this->sendError($validator->errors(), "Validation Errors", []);
         }
 
+        $user_id = $request->user_id;
         $mobile_no = $request->mobile_no;
-        $user = User::where('mobile_no',$mobile_no)->where('role',3)->first();
+
+        $user = LoginUser::where('mobile_no', $mobile_no)->where('role',3)->first();
         if ($user){
             if($user->estatus != 1){
                 return $this->sendError("Your account is de-activated by admin.", "Account De-active", []);
@@ -61,6 +68,56 @@ class AuthController extends BaseController
             return $this->sendResponseWithData($final_data, 'User registered successfully.');
         }
     }
+
+    // Backup Old code
+    // public function login(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'mobile_no' => 'required'
+    //     ]);
+
+    //     if($validator->fails()){
+    //         return $this->sendError($validator->errors(), "Validation Errors", []);
+    //     }
+
+    //     $mobile_no = $request->mobile_no;
+    //     $user = User::where('mobile_no',$mobile_no)->where('role',3)->first();
+    //     if ($user){
+    //         if($user->estatus != 1){
+    //             return $this->sendError("Your account is de-activated by admin.", "Account De-active", []);
+    //         }
+    //         $data['otp'] =  mt_rand(100000,999999);
+    //         $user->otp = $data['otp'];
+    //         $user->otp_created_at = Carbon::now();
+    //         $user->save();
+    //         if($user->first_name == ""){
+    //             $data['user_status'] = 'new_user';
+    //         }else{
+    //             $data['user_status'] = 'exist_user';
+    //         }
+    //         $final_data = array();
+    //         array_push($final_data,$data);
+
+    //         //send_sms($mobile_no, $data['otp']);
+    //         return $this->sendResponseWithData($final_data, 'User login successfully.');
+    //     }else{
+    //         $data['otp'] =  mt_rand(100000,999999);
+
+    //         $user = new User();
+    //         $user->mobile_no = $mobile_no;
+
+    //         $user->role = 3;
+    //         $user->otp = $data['otp'];
+    //         $user->otp_created_at = Carbon::now();
+    //         $user->save();
+    //         $data['user_status'] = 'new_user';
+    //         $final_data = array();
+    //         array_push($final_data,$data);
+
+    //         //send_sms($mobile_no, $data['otp']);
+    //         return $this->sendResponseWithData($final_data, 'User registered successfully.');
+    //     }
+    // }
 
     public function verify_otp(Request $request){
 

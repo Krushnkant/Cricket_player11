@@ -13,14 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user_permissions', function (Blueprint $table) {
+        Schema::create('login_users', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->index();
-            $table->integer('project_page_id')->index();
-            $table->boolean('can_read')->default(0)->comment('0->No,1->Yes');
-            $table->boolean('can_write')->default(0)->comment('0->No,1->Yes');
-            $table->boolean('can_delete')->default(0)->comment('0->No,1->Yes');
-            $table->integer('estatus')->default(1)->comment('1->Active,2->Deactive,3->Deleted,4->Pending');
+            $table->string('firebase_uid', 500)->nullable();
+            $table->integer('total_devices')->default(1);
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());
             $table->dateTime('updated_at')->default(null)->onUpdate(\Carbon\Carbon::now());
             $table->softDeletes();
@@ -34,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_permissions');
+        Schema::dropIfExists('login_users');
     }
 };

@@ -28,9 +28,9 @@ return new class extends Migration
             $table->text('bio')->nullable();
             // $table->text('otp')->nullable();
             // $table->dateTime('otp_created_at')->nullable();
-            $table->text('device_id')->nullable();
-            $table->text('provider_type')->nullable();
-            $table->text('provider_id')->nullable();
+            // $table->text('device_id')->nullable();
+            // $table->text('provider_type')->nullable();
+            // $table->text('provider_id')->nullable();
             $table->enum('role', [1,2,3])->nullable()->comment('1->Admin,2->Sub Admin,3->User');
             $table->enum('eUserType', [1,2])->comment('1->Normal, 2->Subscribe');
             $table->date('subcription_end_date')->nullable();

@@ -47,4 +47,7 @@ Route::post('login-with-email', [AuthController::class, 'loginWithEmail']);
 Route::post('get-series', [MatchController::class, 'getSeries']);
 Route::post('/news', [MatchController::class, 'newsList']);
 
+Route::post('team_head_to_head',[MatchController::class,'teamHeadToHead']);
+Route::post('player_record',[MatchController::class,'playerRecord']);
+
 Route::post('series-team', [MatchController::class, 'getSeriesTeam']);
