@@ -5,8 +5,10 @@ use App\Http\Controllers\Controller;
 use \Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserLogin;
+use App\Models\UserDevice;
 use App\Models\CustomerDeviceToken;
 use App\Models\LoginUser;
+use App\Models\UserCoupon;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\UserResource;
@@ -29,44 +31,78 @@ class AuthController extends BaseController
         }
 
         $user_id = $request->user_id;
-        $mobile_no = $request->mobile_no;
+        $firebase_uid = $request->firebase_uid;
+        $login_type = $request->login_type;
+        $device_id = $request->device_id;
 
-        $user = LoginUser::where('mobile_no', $mobile_no)->where('role',3)->first();
-        if ($user){
-            if($user->estatus != 1){
-                return $this->sendError("Your account is de-activated by admin.", "Account De-active", []);
+        $userProfile = User::where('id', $user_id)->first();
+        if (!$userProfile){
+
+            return $this->sendError("User account not found! Please try again.", "Account De-active", []);
+            
+        } else {
+
+            $loginUser = LoginUser::where('firebase_uid', $firebase_uid)->first();
+            if (!$loginUser) {
+                
+                $newLoginUser = new LoginUser();
+                $newLoginUser->firebase_uid = $firebase_uid;
+                $newLoginUser->total_devices = 1;
+                $newLoginUser->elogin_type = $login_type;
+                $newLoginUser->save();
+
+                // Get last inserted ID
+                $loginUserId = $newLoginUser->id; 
+
+                // save loginUserId to the user table
+                $userProfile->login_user_id = $loginUserId;
+
+            } else {
+
+                $loginUserId = $loginUser->id;
             }
-            $data['otp'] =  mt_rand(100000,999999);
-            $user->otp = $data['otp'];
-            $user->otp_created_at = Carbon::now();
-            $user->save();
-            if($user->first_name == ""){
-                $data['user_status'] = 'new_user';
-            }else{
-                $data['user_status'] = 'exist_user';
+
+            $userProfile->first_name = $request->first_name;
+            $userProfile->last_name = $request->last_name;
+            $userProfile->profile_pic = $request->profile_url;
+            $userProfile->password = $request->password;
+            $userProfile->save();
+
+            $userDevice = UserDevice::where('device_id', $device_id)->first();
+            if (!$userDevice) {
+
+                // Save Device Details
+                $newUserDevice                      = new UserDevice();
+                $newUserDevice->user_id             = $user_id;
+                $newUserDevice->login_user_id       = $loginUserId;
+                $newUserDevice->device_id           = $device_id;
+                $newUserDevice->device_type         = $request->edevice_type;
+                $newUserDevice->brand               = $request->brand;
+                $newUserDevice->model               = $request->model;
+                $newUserDevice->device              = $request->device;
+                $newUserDevice->manufacturer        = $request->manufacturer;
+                $newUserDevice->os_version          = $request->os_version;
+                $newUserDevice->app_version_name    = $request->app_version_name;
+                $newUserDevice->save();
             }
-            $final_data = array();
-            array_push($final_data,$data);
 
-            //send_sms($mobile_no, $data['otp']);
-            return $this->sendResponseWithData($final_data, 'User login successfully.');
-        }else{
-            $data['otp'] =  mt_rand(100000,999999);
+            $userCoupon = UserCoupon::where('user_id', $user_id)->where('estatus', 1)->whereDate('expiry_date', '>=', Carbon::now())->select('coupon_code')->first();
+            
+            $isCouponAvailable = $userCoupon ? true : false;
+            $couponCode = $userCoupon->coupon_code ?? null;
 
-            $user = new User();
-            $user->mobile_no = $mobile_no;
-
-            $user->role = 3;
-            $user->otp = $data['otp'];
-            $user->otp_created_at = Carbon::now();
-            $user->save();
-            $data['user_status'] = 'new_user';
-            $final_data = array();
-            array_push($final_data,$data);
-
-            //send_sms($mobile_no, $data['otp']);
-            return $this->sendResponseWithData($final_data, 'User registered successfully.');
+            $final_data = array(
+                            "user_id"                   => (int) $user_id,
+                            "login_user_id"             => (int) $loginUserId,
+                            "userType"                  => (int) $userProfile->eUserType,
+                            "is_coupon_code_available"  => $isCouponAvailable,
+                            "coupon_code"               => $couponCode
+                        );
+            
+            $response_msg = 'User Logged In successfully.';
         }
+
+        return $this->sendResponseWithData($final_data, $response_msg);
     }
 
     // Backup Old code

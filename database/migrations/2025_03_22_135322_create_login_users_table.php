@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('login_users', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->index();
             $table->string('firebase_uid', 500)->nullable();
             $table->integer('total_devices')->default(1);
             $table->dateTime('created_at')->default(\Carbon\Carbon::now());

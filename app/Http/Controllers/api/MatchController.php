@@ -19,6 +19,8 @@ use App\Models\Tournament;
 use App\Models\User;
 use App\Models\News;
 use App\Models\AppOpenLog;
+use App\Models\UserDevice;
+use App\Models\UserCoupon;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -784,42 +786,60 @@ class MatchController extends BaseController
             return $this->sendError([], "Validation Error", $validator->errors());
         }
 
-        if ($request->userId > 0) {
-            $user = User::find($request->userId);
+        $loginUserId = 0;
+        $device_id = $request->deviceId;
+        $user_id = $request->userId;
+        if ($user_id > 0) {
+
+            $user = User::find($user_id);
+            $loginUserId = $user->login_user_id;
+
         } else {
             $user = new User();
-            $user->device_id = $request->deviceId;
-            $user->provider_type = $request->eDeviceType;
+            $user->login_user_id = $loginUserId;
             $user->role = 3;
+            $user->eUserType = 1;
+            $user->username = $device_id;
             $user->save();
+        }
+        
+        $userDevice = UserDevice::where('device_id', $device_id)->first();
+        if (!$userDevice) {
+
+            // Save Device Details
+            $newUserDevice                      = new UserDevice();
+            $newUserDevice->user_id             = $user_id;
+            $newUserDevice->login_user_id       = $loginUserId;
+            $newUserDevice->device_id           = $device_id;
+            $newUserDevice->device_type         = $request->eDeviceType;
+            $newUserDevice->brand               = $request->brand;
+            $newUserDevice->model               = $request->model;
+            $newUserDevice->device              = $request->device;
+            $newUserDevice->manufacturer        = $request->manufacturer;
+            $newUserDevice->os_version          = $request->osVersion;
+            $newUserDevice->app_version_name    = $request->appVersionName;
+            $newUserDevice->save();
+
+            // Get last inserted ID
+            $newUserDeviceId = $newUserDevice->id; 
+        } else {
+            $newUserDeviceId = $userDevice->id;
         }
 
         AppOpenLog::create([
-            'user_id'         => $user->id,
-            'device_id'       => $request->deviceId,
-            'device_type'     => $request->eDeviceType,
-            'brand'           => $request->brand,
-            'model'           => $request->model,
-            'device'          => $request->device,
-            'manufacturer'    => $request->manufacturer,
-            'os_version'      => $request->osVersion,
-            'app_version_name'=> $request->appVersionName,
-            'visit_time' => now()->format('H:i:s'),
-            // 'utm_referrer'    => $request->utmReferrer,
-            'created_at'      => Carbon::now(),
+            'user_id'               => $user->id,
+            'user_device_id'        => $newUserDeviceId,
+            'visit_time'        => now()->format('H:i:s'),
+            'created_at'            => Carbon::now(),
         ]);
 
-        $userCoupon = DB::table('user_coupon')
-            ->where('user_id', $user->id)
-            ->where('estatus', 1)
-            ->where('expiry_date', '>=', now()) 
-            ->first();
+        $userCoupon = UserCoupon::where('user_id', $user_id)->where('estatus', 1)->whereDate('expiry_date', '>=', Carbon::now())->select('coupon_code')->first();
 
         $isCouponAvailable = $userCoupon ? true : false;
         $couponCode = $userCoupon->coupon_code ?? null;
 
         $temp['userId'] = $user->id;
-        $temp['userType'] = $user->eUserType;
+        $temp['userType'] = (int) $user->eUserType;
         $temp['isCouponCodeAvailable'] = $isCouponAvailable;
         $temp['couponCode'] = $couponCode;
         $temp['email'] = $user->email ?? '';
