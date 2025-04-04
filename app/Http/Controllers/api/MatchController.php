@@ -967,111 +967,36 @@ class MatchController extends BaseController
 
     public function teamHeadToHead(Request $request){
       
-        // $totalmatches = Matche::where(function($q) use($request) {
-        //     $q->where(['team1_id'=>$request->team1_id,'team2_id'=>$request->team2_id])
-        //        ->orWhere(['team1_id'=>$request->team2_id,'team2_id'=>$request->team1_id]);
-        //      });
-        //     if(isset($request->match_type)){
-        //         $totalmatches = $totalmatches->where('match_type',$request->match_type);
-        //     }
-        //     if(isset($request->stadium_id)){
-        //         $totalmatches = $totalmatches->where('stadium_id',$request->stadium_id);
-        //     }
-        //     $totalmatches = $totalmatches->count();
-
-        // $team1_winner_matches = Matche::where(function($q) use($request) {
-        //     $q->where(['team1_id'=>$request->team1_id,'team2_id'=>$request->team2_id])
-        //        ->orWhere(['team1_id'=>$request->team2_id,'team2_id'=>$request->team1_id]);
-        //      })->where('win_team_id',$request->team1_id);
-        //      if(isset($request->match_type)){
-        //          $team1_winner_matches = $team1_winner_matches->where('match_type',$request->match_type);
-        //      }
-        //      if(isset($request->stadium_id)){
-        //          $team1_winner_matches = $team1_winner_matches->where('stadium_id',$request->stadium_id);
-        //      }
-        //      $team1_winner_matches = $team1_winner_matches->count();
-
-        // $team2_winner_matches = Matche::where(function($q) use($request) {
-        //     $q->where(['team1_id'=>$request->team1_id,'team2_id'=>$request->team2_id])
-        //         ->orWhere(['team1_id'=>$request->team2_id,'team2_id'=>$request->team1_id]);
-        //         })->where('win_team_id',$request->team2_id);
-        //         if(isset($request->match_type)){
-        //             $team2_winner_matches = $team2_winner_matches->where('match_type',$request->match_type);
-        //         }
-        //         if(isset($request->stadium_id)){
-        //             $team2_winner_matches = $team2_winner_matches->where('stadium_id',$request->stadium_id);
-        //         }
-        //         $team2_winner_matches = $team2_winner_matches->count();
-
-        // $noresultmatches = Matche::where(function($q) use($request) {
-        //     $q->where(['team1_id'=>$request->team1_id,'team2_id'=>$request->team2_id])
-        //         ->orWhere(['team1_id'=>$request->team2_id,'team2_id'=>$request->team1_id]);
-        //         })->where('win_team_id',0);
-        //         if(isset($request->match_type)){
-        //             $noresultmatches = $noresultmatches->where('match_type',$request->match_type);
-        //         }
-        //         if(isset($request->stadium_id)){
-        //             $noresultmatches = $noresultmatches->where('stadium_id',$request->stadium_id);
-        //         }
-        //         $noresultmatches = $noresultmatches->count();
 
 
+        $matchQuery = Matche::where(function ($q) use ($request) {
+            $q->where(['team1_id' => $request->team1_id, 'team2_id' => $request->team2_id])
+              ->orWhere(['team1_id' => $request->team2_id, 'team2_id' => $request->team1_id]);
+        });
+        
+        if ($request->filled('match_type')) {
+            $matchQuery->where('match_type', $request->match_type);
+        }
+        if ($request->filled('stadium_id')) {
+            $matchQuery->where('stadium_id', $request->stadium_id);
+        }
+        
+        $totalmatches = (clone $matchQuery)->count();
+        $team1_winner_matches = (clone $matchQuery)->where('win_team_id', $request->team1_id)->count();
+        $team2_winner_matches = (clone $matchQuery)->where('win_team_id', $request->team2_id)->count();
+        $noresultmatches = (clone $matchQuery)->where('win_team_id', 0)->count();
 
-        // $data['total_matches'] = $totalmatches;
-        // $data['team1_winner_matches'] = $team1_winner_matches;
-        // $data['team1_loss_matches'] = $team2_winner_matches;
-        // $data['team2_winner_matches'] = $team2_winner_matches;
-        // $data['team2_loss_matches'] = $team1_winner_matches;
-        // $data['no_result_match'] = $noresultmatches;
+        $team1 = Team::find($request->team1_id);
+        $team2 = Team::find($request->team2_id);
 
-        // $matches = Matche::where(function($q) use($request) {
-        //     $q->where(['team1_id'=>$request->team1_id,'team2_id'=>$request->team2_id])
-        //         ->orWhere(['team1_id'=>$request->team2_id,'team2_id'=>$request->team1_id]);
-        //         });
-        //         if(isset($request->match_type)){
-        //             $matches = $matches->where('match_type',$request->match_type);
-        //         }
-        //         if(isset($request->stadium_id)){
-        //             $matches = $matches->where('stadium_id',$request->stadium_id);
-        //         }
-        //         $matches = $matches->get();
-
-        // $matches_arr = array();
-        // foreach ($matches as $match){
-        //     $temp = array();
-        //     $temp['id'] = $match->id;
-        //     $temp['serie'] = isset($match->series)?$match->series->name:"";
-        //     $temp['serie_type'] = matchType(isset($match->series)?$match->series->series_type:0);
-        //     $temp['tournament'] = matchType(isset($match->series->tournament)?$match->series->tournament->name:"");
-        //     $temp['team1_id'] = $match->team1_id;
-        //     $temp['team1'] = isset($match->team1)?$match->team1->name:"";
-        //     $temp['team1_image'] = isset($match->team1)?url('images/team/'.$match->team1->thumb_img):"";
-        //     $temp['team2_id'] = $match->team2_id;
-        //     $temp['team2'] = isset($match->team2)?$match->team2->name:"";
-        //     $temp['team2_image'] = isset($match->team2)?url('images/team/'.$match->team2->thumb_img):"";
-        //     $temp['stadium'] = isset($match->stadium)?$match->stadium->name:"";
-        //     $temp['stadium_country'] = isset($match->stadium->coutry)?$match->stadium->coutry->name:"";
-        //     $temp['stadium_state'] = isset($match->stadium)?$match->stadium->state:"";
-        //     $temp['stadium_city'] = isset($match->stadium)?$match->stadium->city:"";
-        //     $temp['match_type'] = matchType($match->match_type);
-        //     $temp['winner_team_id'] = $match->win_team_id;
-        //     $temp['team1_score'] = $match->team1_score;
-        //     $temp['team2_score'] = $match->team2_score;
-        //     $temp['winning_statement'] = $match->winning_statement;
-        //     $temp['start_date'] = $match->start_date;
-        //     array_push($matches_arr,$temp);
-        // }
-        // $data['matches'] = $matches_arr;
-
-        $data['team1_name'] = "Royal Challengers Banglore";
-        $data['team1_shortname'] = "RCB";
-        $data['team1_logo'] = "https://theplayer.webvedanttechnology.com/images/team/thumb_img_3469821742641567.jpg";
-        $data['team2_name'] = "Chennai Supar Kings";
-        $data['team2_shortname'] = "CSK";
-        $data['team2_logo'] = "https://theplayer.webvedanttechnology.com/images/team/thumb_img_9508371742641523.jpg";
-        $data['team1_win'] = 1;
-        $data['team2_win'] = 4;
-
+        $data['team1_name'] = $team1->name ?? '';
+        $data['team1_shortname'] = $team1->short_name ?? '';
+        $data['team1_logo'] = $team1->thumb_img ? url('images/team/'.$team1->thumb_img) : '';
+        $data['team2_name'] = $team2->name ?? '';
+        $data['team2_shortname'] = $team2->short_name ?? '';
+        $data['team2_logo'] = $team2->thumb_img ? url('images/team/'.$team2->thumb_img) : '';
+        $data['team1_win'] = $team1_winner_matches;
+        $data['team2_win'] = $team2_winner_matches;
 
         $lst_team1_last_five_match = array();
         $lst_team2_last_five_match = array();
@@ -1082,122 +1007,189 @@ class MatchController extends BaseController
         $lst_top_bowler_last_five_match = array();
         $lst_top_allrounder_last_five_match = array();
 
-        // team 1 last five match
-        for($b=0; $b<5; $b++){
-            $lst_team1_last_five_match[] = array(
-                                        'match_id'   => $b,
-                                        'match_name' => 'RCB vs CSK',
-                                        'is_win'     => 1 // 0 for No, 1 for Yes, 
-            );
+        $team1_last_5 = Matche::where(function($q) use($request) {
+            $q->where('team1_id', $request->team1_id)
+              ->orWhere('team2_id', $request->team1_id);
+        })
+        ->latest('start_date')
+        ->take(5)
+        ->get();
+    
+        $lst_team1_last_five_match = $team1_last_5->map(function ($match) use ($request) {
+            return [
+                'match_id'   => $match->id,
+                'match_name' => $match->team1->short_name . ' vs ' . $match->team2->short_name,
+                'is_win'     => $match->win_team_id == $request->team1_id ? 1 : 0,
+            ];
+        });
+        
+        $team2_last_5 = Matche::where(function($q) use($request) {
+                $q->where('team1_id', $request->team2_id)
+                ->orWhere('team2_id', $request->team2_id);
+            })
+            ->latest('start_date')
+            ->take(5)
+            ->get();
+        
+        $lst_team2_last_five_match = $team2_last_5->map(function ($match) use ($request) {
+            return [
+                'match_id'   => $match->id,
+                'match_name' => $match->team1->short_name . ' vs ' . $match->team2->short_name,
+                'is_win'     => $match->win_team_id == $request->team2_id ? 1 : 0,
+            ];
+        });
 
-            // team 2 last five match
-            $lst_team2_last_five_match[] = array(
-                'match_id'   => $b,
-                'match_name' => 'RCB vs CSK',
-                'is_win'     => 0 // 0 for No, 1 for Yes, 
-            );
+        $last_5_matches_between_teams = Matche::where(function ($q) use ($request) {
+            $q->where('team1_id', $request->team1_id)
+              ->where('team2_id', $request->team2_id)
+            ->orWhere(function ($q) use ($request) {
+                $q->where('team1_id', $request->team2_id)
+                  ->where('team2_id', $request->team1_id);
+            });
+        })
+        ->latest('start_date')
+        ->take(5)
+        ->pluck('id');
 
-            // top batsman 
-            $lst_top_batsman[] = array(
-                "player_id"     => $b,
-                "player_name"   => "Virat Kohli",
-                "player_img"    => "https://theplayer.webvedanttechnology.com/images/team/thumb_img_9508371742641523.jpg",
-                "total_ball"    => 15,
-                "total_run"     => 20,
-                "fours"         => 4,
-                "sixes"         => 1,
-                "strike_rate"   => 50.33,
-                "fantasy_point" => 15
-            );
+        $last_5_matches_team1_or_team2 = Matche::where(function ($q) use ($request) {
+            $q->where('team1_id', $request->team1_id)
+              ->orWhere('team2_id', $request->team1_id)
+              ->orWhere('team1_id', $request->team2_id)
+              ->orWhere('team2_id', $request->team2_id);
+        })
+        ->latest('start_date')
+        ->take(5)
+        ->pluck('id');
 
-            // top batsman of last five match
-            $lst_top_batsman_last_five_match[] = array(
-                                                    "player_id"     => $b,
-                                                    "player_name"   => "Virat Kohli",
-                                                    "player_img"    => "https://theplayer.webvedanttechnology.com/images/team/thumb_img_9508371742641523.jpg",
-                                                    "total_ball"    => 15,
-                                                    "total_run"     => 20,
-                                                    "fours"         => 4,
-                                                    "sixes"         => 1,
-                                                    "strike_rate"   => 50.33,
-                                                    "fantasy_point" => 15
-                                                );
+        $lst_top_batsman = DB::table('match_scoreboards as ms')
+        ->join('players as p', 'ms.player_id', '=', 'p.id')
+        ->whereIn('p.player_type', [1, 3])
+        ->whereIn('ms.match_id', $last_5_matches_between_teams) // Filter for Team1 vs Team2 last 5 matches
+        ->select(
+            'ms.player_id as playerId',
+            'p.name as playerName',
+            'p.thumb_img as playerImg',
+            DB::raw('SUM(ms.ball) as totalBall'),
+            DB::raw('SUM(ms.run) as totalRun'),
+            DB::raw('SUM(ms.four) as fours'),
+            DB::raw('SUM(ms.six) as sixes'),
+            DB::raw('AVG(ms.strike_rate) as strikeRate'),
+            DB::raw('SUM(ms.fantasy_point) as fantasyPoint')
+        )
+        ->groupBy('ms.player_id', 'p.name', 'p.thumb_img')
+        ->orderByDesc('totalRun')
+        ->limit(5)
+        ->get();
 
-            // top bowler 
-            $lst_top_bowler[] = array(
-                        "player_id"     => $b,
-                        "player_name"   => "Virat Kohli",
-                        "player_img"    => "https://theplayer.webvedanttechnology.com/images/team/thumb_img_9508371742641523.jpg",
-                        "total_over"    => 15,
-                        "total_run"     => 20,
-                        "maiden"        => 4,
-                        "wickets"       => 1,
-                        "economy_rate"  => 50.33,
-                        "fantasy_point" => 15
-                    );
+        $lst_top_batsman_last_five_match = DB::table('match_scoreboards as ms')
+        ->join('players as p', 'ms.player_id', '=', 'p.id')
+        ->whereIn('p.player_type', [1, 3])
+        
+        ->whereIn('ms.match_id', $last_5_matches_team1_or_team2) // Filter for either Team1 or Team2 last 5 matches
+        ->select(
+            'ms.player_id as playerId',
+            'p.name as playerName',
+            'p.thumb_img as playerImg',
+            DB::raw('SUM(ms.ball) as totalBall'),
+            DB::raw('SUM(ms.run) as totalRun'),
+            DB::raw('SUM(ms.four) as fours'),
+            DB::raw('SUM(ms.six) as sixes'),
+            DB::raw('AVG(ms.strike_rate) as strikeRate'),
+            DB::raw('SUM(ms.fantasy_point) as fantasyPoint')
+        )
+        ->groupBy('ms.player_id', 'p.name', 'p.thumb_img')
+        ->orderByDesc('totalRun')
+        ->limit(5)
+        ->get();
 
-            // top bowler of last five match
-            $lst_top_bowler_last_five_match[] = array(
-                                        "player_id"     => $b,
-                                        "player_name"   => "Virat Kohli",
-                                        "player_img"    => "https://theplayer.webvedanttechnology.com/images/team/thumb_img_9508371742641523.jpg",
-                                        "total_over"    => 15,
-                                        "total_run"     => 20,
-                                        "maiden"        => 4,
-                                        "wickets"       => 1,
-                                        "economy_rate"  => 50.33,
-                                        "fantasy_point" => 15
-                                    );
+        $lst_top_bowler = DB::table('match_scoreboards as ms')
+        ->join('players as p', 'ms.player_id', '=', 'p.id')
+        ->whereIn('p.player_type', [2])
+        ->whereIn('ms.match_id', $last_5_matches_between_teams)
+        ->select(
+            'ms.player_id as playerId',
+            'p.name as playerName',
+            'p.thumb_img as playerImg',
+            DB::raw('SUM(ms.over) as totalOver'),
+            DB::raw('SUM(ms.ball_run) as totalRun'),
+            DB::raw('SUM(ms.maiden) as maiden'),
+            DB::raw('SUM(ms.wicket) as wickets'),
+            DB::raw('AVG(ms.economy_rate) as economyRate'),
+            DB::raw('SUM(ms.fantasy_point) as fantasyPoint')
+        )
+        ->groupBy('ms.player_id', 'p.name', 'p.thumb_img')
+        ->orderByDesc('wickets')
+        ->limit(5)
+        ->get();
 
-            // top allrounder 
-            $lst_top_allrounder[] = array(
-                        "player_id"     => $b,
-                        "player_name"   => "Virat Kohli",
-                        "player_img"    => "https://theplayer.webvedanttechnology.com/images/team/thumb_img_9508371742641523.jpg",
-                        "total_ball"    => 15,
-                        "total_run"     => 20,
-                        "fours"         => 4,
-                        "sixes"         => 1,
-                        "strike_rate"   => 50.33,
-                        "total_over"    => 15,
-                        "total_run"     => 20,
-                        "maiden"        => 4,
-                        "wickets"       => 1,
-                        "economy_rate"  => 50.33,
-                        "fantasy_point" => 15
-                    );
+        $lst_top_bowler_last_five_match = DB::table('match_scoreboards as ms')
+        ->join('players as p', 'ms.player_id', '=', 'p.id')
+        ->whereIn('p.player_type', [2])
+        ->whereIn('ms.match_id', $last_5_matches_team1_or_team2)
+        ->select(
+            'ms.player_id as playerId',
+            'p.name as playerName',
+            'p.thumb_img as playerImg',
+            DB::raw('SUM(ms.over) as totalOver'),
+            DB::raw('SUM(ms.ball_run) as totalRun'),
+            DB::raw('SUM(ms.maiden) as maiden'),
+            DB::raw('SUM(ms.wicket) as wickets'),
+            DB::raw('AVG(ms.economy_rate) as economyRate'),
+            DB::raw('SUM(ms.fantasy_point) as fantasyPoint')
+        )
+        ->groupBy('ms.player_id', 'p.name', 'p.thumb_img')
+        ->orderByDesc('wickets')
+        ->limit(5)
+        ->get();
 
-            // top allrounder of last five match
-            $lst_top_allrounder_last_five_match[] = array(
-                                        "player_id"     => $b,
-                                        "player_name"   => "Virat Kohli",
-                                        "player_img"    => "https://theplayer.webvedanttechnology.com/images/team/thumb_img_9508371742641523.jpg",
-                                        "total_ball"    => 15,
-                                        "total_run"     => 20,
-                                        "fours"         => 4,
-                                        "sixes"         => 1,
-                                        "strike_rate"   => 50.33,
-                                        "total_over"    => 15,
-                                        "total_run"     => 20,
-                                        "maiden"        => 4,
-                                        "wickets"       => 1,
-                                        "economy_rate"  => 50.33,
-                                        "fantasy_point" => 15
-                                    );
-        }
+        $lst_top_allrounder = DB::table('match_scoreboards as ms')
+        ->join('players as p', 'ms.player_id', '=', 'p.id')
+        ->whereIn('p.player_type', [4]) // Allrounders
+        ->whereIn('ms.match_id', $last_5_matches_between_teams)
+        ->select(
+            'ms.player_id as playerId',
+            'p.name as playerName',
+            'p.thumb_img as playerImg',
+            DB::raw('SUM(ms.run) as totalRun'),
+            DB::raw('SUM(ms.wicket) as wickets'),
+            DB::raw('SUM(ms.fantasy_point) as fantasyPoint')
+        )
+        ->groupBy('ms.player_id', 'p.name', 'p.thumb_img')
+        ->orderByDesc('fantasyPoint')
+        ->limit(5)
+        ->get();
+
+   
+    $lst_top_allrounder_last_five_match = DB::table('match_scoreboards as ms')
+        ->join('players as p', 'ms.player_id', '=', 'p.id')
+        ->whereIn('p.player_type', [4]) // Allrounders
+        ->whereIn('ms.match_id', $last_5_matches_team1_or_team2)
+        ->select(
+            'ms.player_id as playerId',
+            'p.name as playerName',
+            'p.thumb_img as playerImg',
+            DB::raw('SUM(ms.run) as totalRun'),
+            DB::raw('SUM(ms.wicket) as wickets'),
+            DB::raw('SUM(ms.fantasy_point) as fantasyPoint')
+        )
+        ->groupBy('ms.player_id', 'p.name', 'p.thumb_img')
+        ->orderByDesc('fantasyPoint')
+        ->limit(5)
+        ->get();
+
         $data['lst_team1_last_five_match'] = $lst_team1_last_five_match;
         $data['lst_team2_last_five_match'] = $lst_team2_last_five_match;
-        $data['lst_top_batsman'] = $lst_team2_last_five_match;
-        $data['lst_top_bowler'] = $lst_team2_last_five_match;
-        $data['lst_top_allrounder'] = $lst_team2_last_five_match;
-        $data['lst_top_batsman_last_five_match'] = $lst_team2_last_five_match;
-        $data['lst_top_bowler_last_five_match'] = $lst_team2_last_five_match;
-        $data['lst_top_allrounder_last_five_match'] = $lst_team2_last_five_match;
+        $data['lst_top_batsman'] = $lst_top_batsman;
+        $data['lst_top_bowler'] = $lst_top_bowler;
+        $data['lst_top_allrounder'] = $lst_top_allrounder;
+        $data['lst_top_batsman_last_five_match'] = $lst_top_batsman_last_five_match;
+        $data['lst_top_bowler_last_five_match'] = $lst_top_bowler_last_five_match;
+        $data['lst_top_allrounder_last_five_match'] = $lst_top_allrounder_last_five_match;
 
         return $this->sendResponseWithData($data, "Tournament Team Retrieved Successfully.");
     }
 
-    public function playerRecord(Request $request){
+    public function playerRecordOld(Request $request){
 
         // $matchcommentries = MatchCommentry::where(['batsman_id'=>$request->player1_id,'bowler_id'=>$request->player2_id]);
         // if(isset($request->match_type)){
@@ -1293,6 +1285,132 @@ class MatchController extends BaseController
         $data['lst_player_last_five_record'] = $lst_player_last_five_record;
 
         return $this->sendResponseWithData($data, "Player Vs Player Retrieved Successfully.");
+    }
+
+    public function playerRecord(Request $request)
+    {
+        $player_id = $request->player_id;
+
+        // Validate player_id is required
+        if (!$player_id) {
+            return $this->sendError("Player ID is required", 400);
+        }
+
+        // 🏏 Get Player Details
+        $player = Player::find($player_id);
+        if (!$player) {
+            return $this->sendError("Player not found", 404);
+        }
+
+        // 🏏 Optional: Get Opponent Team Details
+        $obj_opp_team = null;
+        if ($request->has('opp_team_id')) {
+            $opp_team = Team::find($request->opp_team_id);
+            if ($opp_team) {
+                $obj_opp_team = [
+                    "team_name" => $opp_team->name ?? '',
+                    "team_short_name" => $opp_team->short_name ?? '',
+                    "team_logo" => $opp_team->thumb_img ? url('images/team/' . $opp_team->thumb_img) : '',
+                ];
+            }
+        }
+
+        // 🏏 Optional: Get Opponent Player Details
+        $obj_opp_player = null;
+        if ($request->has('opp_player_id')) {
+            $opp_player = Player::find($request->opp_player_id);
+            if ($opp_player) {
+                $obj_opp_player = [
+                    "player_id" => $opp_player->id ?? null,
+                    "player_name" => $opp_player->name ?? '',
+                    "player_img" => $opp_player->thumb_img ? url('images/team/' . $opp_player->thumb_img) : '',
+                ];
+            }
+        }
+
+
+
+        $query = MatchCommentry::where(function ($q) use ($player_id) {
+            $q->where('batsman_id', $player_id)->orWhere('bowler_id', $player_id);
+        });
+        
+        // 🏏 If Opponent Player is provided, check for both batsman and bowler
+        if ($request->has('opp_player_id') && $request->opp_player_id != null) {
+            $opp_player_id = $request->opp_player_id;
+            $query->where(function ($q) use ($opp_player_id) {
+                $q->where('batsman_id', $opp_player_id)->orWhere('bowler_id', $opp_player_id);
+            });
+        }
+        
+        // 🏏 Step 1: Get last 5 distinct match IDs
+        $last_five_match_ids = $query->select('match_id')
+            ->distinct()
+            ->latest('match_id')
+            ->limit(5)
+            ->pluck('match_id');  // Returns an array of match IDs
+       
+        // 🏏 Step 2: Fetch all balls from these matches
+        $last_five_matches = MatchCommentry::whereIn('match_id', $last_five_match_ids)
+            ->where(function ($q) use ($player_id) {
+                $q->where('batsman_id', $player_id)->orWhere('bowler_id', $player_id);
+            })
+            ->orderBy('match_id', 'desc')
+            ->get();
+
+        
+     
+
+        // 🏏 Calculate Stats
+        $total_matches = $last_five_matches->groupBy('match_id')->count();
+        $total_runs = $last_five_matches->sum('run');
+        $balls_faced = $last_five_matches->count();
+        $fours = $last_five_matches->where('run', 4)->count();
+        $sixes = $last_five_matches->where('run', 6)->count();
+        $strike_rate = $balls_faced > 0 ? number_format(($total_runs / $balls_faced) * 100, 2) : 0;
+        $wickets = $last_five_matches->where('is_out', 1)->count();
+
+        // 🏏 Player Record Object
+        $lst_player_record = [
+            "total_ball" => $balls_faced,
+            "total_run" => $total_runs,
+            "fours" => $fours,
+            "sixes" => $sixes,
+            "strike_rate" => $strike_rate,
+            "total_over" => round($balls_faced / 6, 1),
+            "maiden" => 0, // Need to fetch maiden overs separately
+            "wickets" => $wickets,
+            "economy_rate" => 0, // Economy rate calculation can be added later
+            "fantasy_point" => ($total_runs + ($wickets * 25)), // Example formula for fantasy points
+        ];
+
+        // 🏏 Last Five Matches Record
+        $lst_player_last_five_record = $last_five_matches->map(function ($match) {
+            return [
+                "total_ball" => 1,
+                "total_run" => $match->run,
+                "fours" => $match->run == 4 ? 1 : 0,
+                "sixes" => $match->run == 6 ? 1 : 0,
+                "strike_rate" => 100, // Can be improved
+                "total_over" => 1,
+                "maiden" => 0,
+                "wickets" => $match->is_out ? 1 : 0,
+                "economy_rate" => 0,
+                "fantasy_point" => ($match->run + ($match->is_out ? 25 : 0)),
+            ];
+        });
+
+        // 🏏 Final Response Data
+        $data = [
+            "player_id" => $player->id,
+            "player_name" => $player->name,
+            "player_img" => url('images/team/' . $player->thumb_img),
+            "obj_opp_team" => $obj_opp_team,
+            "obj_opp_player" => $obj_opp_player,
+            "lst_player_record" => [$lst_player_record],
+            "lst_player_last_five_record" => $lst_player_last_five_record,
+        ];
+
+        return $this->sendResponseWithData($data, "Player Record Retrieved Successfully.");
     }
 
 }
