@@ -9,8 +9,9 @@ class Series extends Model
 {
     use HasFactory;
 
-    public function tournament(){
-        return $this->hasOne(Tournament::class,'id','tournament_id');
+    public function tournament()
+    {
+        return $this->belongsTo(Tournament::class, 'tournament_id');
     }
 
     public function series_team(){

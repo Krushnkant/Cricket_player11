@@ -28,4 +28,9 @@ class MatchCommentry extends Model
     public function getUserAge() {
         return $this->username.', '.$this->age;
     }
+
+    public function match()
+    {
+        return $this->belongsTo(Matche::class, 'match_id');
+    }
 }

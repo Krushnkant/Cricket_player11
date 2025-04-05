@@ -9,8 +9,9 @@ class Matche extends Model
 {
     use HasFactory;
 
-    public function series(){
-        return $this->hasOne(Series::class,'id','series_id');
+    public function series()
+    {
+        return $this->belongsTo(Series::class, 'series_id');
     }
 
     public function team1(){
